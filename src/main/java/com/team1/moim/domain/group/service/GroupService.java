@@ -1,6 +1,7 @@
 package com.team1.moim.domain.group.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.team1.moim.domain.event.dto.response.AvailableResponse;
 import com.team1.moim.domain.event.entity.Event;
 import com.team1.moim.domain.event.repository.EventRepository;
 import com.team1.moim.domain.group.dto.request.GroupAlarmRequest;
@@ -25,6 +26,9 @@ import com.team1.moim.domain.member.exception.MemberNotFoundException;
 import com.team1.moim.domain.member.repository.MemberRepository;
 import com.team1.moim.domain.group.dto.response.VoteResponse;
 import com.team1.moim.domain.notification.NotificationType;
+import com.team1.moim.domain.notification.dto.NotificationResponseNew;
+import com.team1.moim.domain.notification.exception.NotificationNotFoundException;
+import com.team1.moim.global.config.redis.RedisService;
 import com.team1.moim.global.config.s3.S3Service;
 import com.team1.moim.domain.notification.dto.GroupNotification;
 import com.team1.moim.global.config.sse.service.SseService;
@@ -60,6 +64,7 @@ public class GroupService {
     private final EventRepository eventRepository;
     private final S3Service s3Service;
     private final SseService sseService;
+    private final RedisService redisService;
 
     // 모임 생성하기
     @Transactional
@@ -219,8 +224,6 @@ public class GroupService {
 
         List<ListGroupResponse> groupResponse = new ArrayList<>();
 
-
-
         for(Group group: groups){ // 자기가 속한 모든 그룹의 정보를 추출
             List<String[]> guestEmailNicknameIsAgreed = new ArrayList<>(); // 각 그룹의 게스트 이메일, 닉네임, 동의여부
             List<GroupInfo> tempGroupInfos = groupInfoRepository.findByGroup(group);
@@ -228,57 +231,13 @@ public class GroupService {
             for(GroupInfo groupInfo : tempGroupInfos){
                 guestEmailNicknameIsAgreed.add(new String[]{groupInfo.getMember().getEmail(),
                                                             groupInfo.getMember().getNickname(),
-                                                            groupInfo.getIsAgreed()});
+                                                            groupInfo.getIsAgreed(),
+                                                            String.valueOf(groupInfo.getId())});
 
             }
             groupResponse.add(ListGroupResponse.from(group, guestEmailNicknameIsAgreed));
         }
 
-
-//        for(Group group1: groups){
-//            groupResponse.add(ListGroupResponse.from(group1, guestEmailNicknameIsAgreed));
-//        }
-
-
-
-//        Specification<Group> spec = new Specification<>() {
-//            @Override
-//            public Predicate toPredicate(Root<Group> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
-//                List<Predicate> predicates = new ArrayList<>();
-//
-//                // Group 테이블과 GroupInfo 테이블을 조인하고, 그 결과에서 특정 멤버의 이메일이 loginEmail과 같은 그룹만 선택
-//                // SELECT * FROM Group g
-//                // JOIN GroupInfo gi ON g.id = gi.group_id
-//                // WHERE gi.member.email = :loginEmail
-//                Join<Group, GroupInfo> groupJoin = root.join("groupInfos");
-//                predicates.add(criteriaBuilder.equal(groupJoin.get("member").get("email"), loginEmail));
-//
-//                // 삭제되지 않은 그룹
-//                predicates.add(criteriaBuilder.equal(root.get("isDeleted"), "N"));
-//
-//                // filterConfirmed가 true일 경우, 명시적으로 "확정"(isConfirmed가 "Y")된 그룹을 검색
-//                // filterWaiting가 true일 경우, "대기" 상태(isConfirmed가 "N"이고 isAgreed가 "N")인 그룹을 검색
-//                // filterAdjusting가 true일 경우, "조율" 상태(isConfirmed가 "N"이고 isAgreed가 "Y")인 그룹을 검색
-//                // 사용자가 특정 상태의 그룹만 보고 싶다면, 해당 상태에 대한 필터를 true로 설정.
-//                // 모든 그룹을 확인하고 싶다면, 모든 필터를 false로 두거나 설정하지 않으면 됨.
-//
-//                if (groupSearchRequest.isFilterConfirmed()) {
-//                    predicates.add(criteriaBuilder.equal(groupJoin.get("isConfirmed"), "Y"));
-//                } else if (groupSearchRequest.isFilterWaiting()) {
-//                    predicates.add(criteriaBuilder.equal(groupJoin.get("isConfirmed"), "N"));
-//                    predicates.add(criteriaBuilder.equal(groupJoin.get("isAgreed"), "N"));
-//                } else if (groupSearchRequest.isFilterAdjusting()) {
-//                    predicates.add(criteriaBuilder.equal(groupJoin.get("isConfirmed"), "N"));
-//                    predicates.add(criteriaBuilder.equal(groupJoin.get("isAgreed"), "Y"));
-//                }
-//
-//                return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
-//            }
-//        };
-
-//        List<ListGroupResponse> groups = groupRepository.findAll( pageable).stream()
-//                .map(ListGroupResponse::from)
-//                .collect(Collectors.toList());
         return groupResponse;
     }
 
@@ -306,6 +265,15 @@ public class GroupService {
             // 모임 일정 자동 추천 로직 실행 후 추천 일정 리스트 가져오기
             List<LocalDateTime> recommendEvents = recommendGroupSchedule(savedGroupInfo.getGroup());
             log.info("추천 일정: " + recommendEvents);
+            recommendEvents.forEach(recommendEvent -> {
+                try {
+                    redisService.setAvailableList(groupId.toString(), recommendEvent);
+                } catch (Exception  e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            log.info("추천일정 redis 저장완료");
+
 
             // 모임을 수락한 참여자 리스트 가져오기
             List<GroupInfo> agreedParticipants =
@@ -566,5 +534,11 @@ public class GroupService {
         if (!groupInfo.getIsAgreed().equals("P")) {
             throw new AlreadyVotedException();
         }
+    }
+
+    // redis에 저장된 추천 일정
+    public List<AvailableResponse> getAvailable(String groupId) {
+        List<AvailableResponse> availableList = redisService.getAvailableList(groupId);
+        return availableList;
     }
 }
