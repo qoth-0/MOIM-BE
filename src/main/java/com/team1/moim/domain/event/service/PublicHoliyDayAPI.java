@@ -32,8 +32,6 @@ public class PublicHoliyDayAPI {
         urlBuilder.append("&" + URLEncoder.encode("_type", "UTF-8") + "=" + URLEncoder.encode("json", "UTF-8")); /* json으로 요청 */
 
         URL url = new URL(urlBuilder.toString());
-        log.info("url: " + url);
-
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
         conn.setRequestProperty("Content-type", "application/json");
