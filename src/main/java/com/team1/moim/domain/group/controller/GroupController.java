@@ -153,7 +153,7 @@ public class GroupController {
     public ResponseEntity<ApiSuccessResponse<FindConfirmedGroupResponse>> confirm(HttpServletRequest httpServletRequest,
                                                                  @PathVariable("groupId") Long groupId,
                                                                  @RequestParam("confirmDay") String confirmDay
-                                                                 ) {
+                                                                 ) throws JsonProcessingException {
         log.info("모임 확정 API 시작");
         return ResponseEntity
                 .status(HttpStatus.OK)

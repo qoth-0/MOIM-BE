@@ -542,10 +542,28 @@ public class GroupService {
         return availableList;
     }
 
-
-    public FindConfirmedGroupResponse confirm(Long groupId, String confirmDay) {
+//    모임 확정
+    public FindConfirmedGroupResponse confirm(Long groupId, String confirmDay) throws JsonProcessingException {
         Group group = groupRepository.findById(groupId).orElseThrow(GroupNotFoundException::new);
-        group.confirm(confirmDay);
+        group.confirm();
+        group.setConfirmedDateTime(LocalDateTime.parse(confirmDay));
+
+        // 모임을 수락한 참여자 리스트 가져오기
+        List<GroupInfo> agreedParticipants =
+                groupInfoRepository.findByGroupAndIsAgreed(group, "Y");
+
+        String message = group.getTitle() + " 모임이 확정 되었습니다.";
+
+        // 알림 발송
+        sseService.sendGroupNotification(group.getMember().getEmail(),
+                GroupNotification.from(group, message, NotificationType.GROUP_CONFIRM, LocalDateTime.now()));
+
+
+        for (GroupInfo agreedParticipant : agreedParticipants){
+            sseService.sendGroupNotification(agreedParticipant.getMember().getEmail(),
+                    GroupNotification.from(group, message, NotificationType.GROUP_CONFIRM, LocalDateTime.now()));
+        }
+
         return FindConfirmedGroupResponse.from(groupRepository.save(group));
 
     }
