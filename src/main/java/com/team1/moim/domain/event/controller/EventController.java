@@ -148,7 +148,7 @@ public class EventController {
         ArrayList<HashMap<String, Object>> responseHolidayArr = new ArrayList<>();
 
         try {
-            Map<String, Object> holidayMap = PublicHoliyDayAPI.holidayInfoAPI(year, month);
+            Map<String, Object> holidayMap = publicHoliyDayAPI.holidayInfoAPI(year, month);
             Map<String, Object> response = (Map<String, Object>) holidayMap.get("response");
             Map<String, Object> body = (Map<String, Object>) response.get("body");
 
