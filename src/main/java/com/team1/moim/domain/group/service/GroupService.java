@@ -283,7 +283,7 @@ public class GroupService {
             String message;
             // 모일 수 있는 시간이 없다면, 모두에게 모일 수 없다는 알림 발송
             if (recommendEvents.isEmpty()){
-                message = groupTitle + " 모임이 취소되었습니다.";
+                message = groupTitle + " 모임이 가능한 일정이 없습니다. 다른 날짜로 모임을 다시 생성해주세요.";
 
                 // Group 확정 및 삭제 처리
                 updatedGroup.confirm();
@@ -302,7 +302,7 @@ public class GroupService {
 
                 // 모일 수 있는 일정이 1개라면 자동으로 모임을 확정 짓고 모두에게 알림 전송
             } else if (recommendEvents.size() == 1){
-                message = groupTitle + " 모임이 확정 되었습니다.";
+                message = groupTitle + " 모임이 확정 되었습니다. 일정을 확인해보세요!";
 
                 // Group 확정 처리
                 updatedGroup.confirm();
@@ -319,7 +319,7 @@ public class GroupService {
                 }
                 // 추천 일정이 여러개라면 모임 확정 알림을 호스트 에게만 전송
             } else {
-                message = groupTitle + " 모임을 확정해주세요";
+                message = groupTitle + " 모임을 확정해주세요.";
 
                 // 호스트한테만 알림 발송
                 sseService.sendGroupNotification(updatedGroup.getMember().getEmail(),
@@ -552,7 +552,7 @@ public class GroupService {
         List<GroupInfo> agreedParticipants =
                 groupInfoRepository.findByGroupAndIsAgreed(group, "Y");
 
-        String message = group.getTitle() + " 모임이 확정 되었습니다.";
+        String message = group.getTitle() + " 모임이 확정되었습니다. 일정을 확인해보세요!";
 
         // 알림 발송
         sseService.sendGroupNotification(group.getMember().getEmail(),

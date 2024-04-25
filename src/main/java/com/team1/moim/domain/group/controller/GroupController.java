@@ -93,7 +93,7 @@ public class GroupController {
     @GetMapping("/confirmed/{groupId}")
     public ResponseEntity<ApiSuccessResponse<FindConfirmedGroupResponse>> findConfirmedGroup(
             HttpServletRequest httpServletRequest,
-            @PathVariable Long groupId) {
+            @PathVariable("groupId") Long groupId) {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
