@@ -25,6 +25,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -145,4 +146,22 @@ public class GroupController {
                         httpServletRequest.getServletPath(),
                         groupService.getAvailable(groupId)));
     }
+
+    // 모임 확정 - 호스트
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @PostMapping("/{groupId}/confirm")
+    public ResponseEntity<ApiSuccessResponse<FindConfirmedGroupResponse>> confirm(HttpServletRequest httpServletRequest,
+                                                                 @PathVariable("groupId") Long groupId,
+                                                                 @RequestParam("confirmDay") String confirmDay
+                                                                 ) {
+        log.info("모임 확정 API 시작");
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiSuccessResponse.of(
+                        HttpStatus.OK,
+                        httpServletRequest.getServletPath(),
+                        groupService.confirm(groupId, confirmDay)));
+    }
+
+
 }

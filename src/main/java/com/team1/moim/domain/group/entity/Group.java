@@ -110,6 +110,11 @@ public class Group extends BaseTimeEntity {
         this.isConfirmed = "Y";
     }
 
+    public void confirm(String confirmDay) {
+        this.isConfirmed = "Y";
+        this.confirmedDateTime = LocalDateTime.parse(confirmDay);
+    }
+
     public void setConfirmedDateTime(LocalDateTime confirmedDateTime){
         this.confirmedDateTime = confirmedDateTime;
     }

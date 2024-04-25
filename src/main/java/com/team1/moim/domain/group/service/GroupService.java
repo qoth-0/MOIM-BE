@@ -536,9 +536,17 @@ public class GroupService {
         }
     }
 
-    // redis에 저장된 추천 일정
+    // redis에 저장된 추천 일정 가져오기
     public List<AvailableResponse> getAvailable(String groupId) {
         List<AvailableResponse> availableList = redisService.getAvailableList(groupId);
         return availableList;
+    }
+
+
+    public FindConfirmedGroupResponse confirm(Long groupId, String confirmDay) {
+        Group group = groupRepository.findById(groupId).orElseThrow(GroupNotFoundException::new);
+        group.confirm(confirmDay);
+        return FindConfirmedGroupResponse.from(groupRepository.save(group));
+
     }
 }
