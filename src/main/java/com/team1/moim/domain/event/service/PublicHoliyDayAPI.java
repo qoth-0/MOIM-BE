@@ -19,9 +19,10 @@ import java.util.Map;
 @Slf4j
 public class PublicHoliyDayAPI {
     @Value("${custom.api.secretKey}")
-    private static String secretKey;
+    private String secretKey;
 
-    public static Map<String, Object> holidayInfoAPI(String year, String month) throws IOException {
+    public Map<String, Object> holidayInfoAPI(String year, String month) throws IOException {
+        System.out.println(secretKey);
         StringBuilder urlBuilder = new StringBuilder("http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getHoliDeInfo"); /*URL*/
         urlBuilder.append("?" + URLEncoder.encode("serviceKey", "UTF-8") + "=" + secretKey); /*Service Key*/
         urlBuilder.append("&" + URLEncoder.encode("pageNo", "UTF-8") + "=" + URLEncoder.encode("1", "UTF-8")); /*페이지번호*/
@@ -31,7 +32,6 @@ public class PublicHoliyDayAPI {
         urlBuilder.append("&" + URLEncoder.encode("_type", "UTF-8") + "=" + URLEncoder.encode("json", "UTF-8")); /* json으로 요청 */
 
         URL url = new URL(urlBuilder.toString());
-
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
         conn.setRequestProperty("Content-type", "application/json");
@@ -49,7 +49,7 @@ public class PublicHoliyDayAPI {
         }
         rd.close();
         conn.disconnect();
-        log.info(sb.toString());
+        log.info("!!! " + sb.toString());
 
         return stringToMap(sb.toString());
     }
