@@ -18,7 +18,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByRefreshToken(String refreshToken);
     Optional<Member> findBySocialTypeAndSocialId(SocialType socialType, String socialId);
 
-    @Query("SELECT m FROM Member m WHERE m <> :member")
+    @Query("SELECT m FROM Member m WHERE m <> :member AND m.deleteYn = 'N'")
     List<Member> findAllMemberExcept(@Param("member") Member member);
 
 }

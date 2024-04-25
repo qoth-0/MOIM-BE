@@ -1,9 +1,12 @@
 package com.team1.moim.domain.member.controller;
 
+import com.team1.moim.domain.auth.dto.request.SignUpRequest;
+import com.team1.moim.domain.member.dto.request.UpdateRequest;
 import com.team1.moim.domain.member.dto.response.MemberResponse;
 import com.team1.moim.domain.member.service.MemberService;
 import com.team1.moim.global.dto.ApiSuccessResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -64,6 +67,21 @@ public class MemberController {
                         HttpStatus.OK,
                         request.getServletPath(),
                         memberService.searchMember()));
+    }
+
+    //마이페이지 수정
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @PatchMapping("/update")
+    public ResponseEntity<ApiSuccessResponse<MemberResponse>> update(HttpServletRequest request,
+                                                                           @Valid UpdateRequest updateRequest) {
+
+        log.info("멤버 수정 시작");
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiSuccessResponse.of(
+                        HttpStatus.OK,
+                        request.getServletPath(),
+                        memberService.update(updateRequest)));
     }
 
 }
