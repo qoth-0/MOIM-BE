@@ -215,10 +215,13 @@ public class GroupService {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
 
         List<GroupInfo> guestGroupInfo = groupInfoRepository.findByMemberId(member.getId()); // 자기가 게스트인 그룹의 인포
-        List<Group> groups = groupRepository.findByMemberId(member.getId()); // 자기가 호스트인 그룹
+        List<Group> groups = groupRepository.findByMemberIdAndIsDeleted(member.getId(), "N"); // 자기가 호스트인 그룹
 
         for (GroupInfo groupInfo : guestGroupInfo){
-            groups.add(groupInfo.getGroup());
+            if(groupInfo.getGroup().getIsDeleted().equals("N")){
+                groups.add(groupInfo.getGroup());
+            }
+
         }
         // 자기가 속한 모든 그룹 = groups
 
