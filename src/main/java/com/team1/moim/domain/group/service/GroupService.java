@@ -284,9 +284,26 @@ public class GroupService {
 
             String groupTitle = savedGroupInfo.getGroup().getTitle();
             String message;
+
+            // 모임을 모두 거절한 경우
+            if(agreedParticipants.isEmpty()) {
+                message = groupTitle + " 모임이 참여자가 없어 취소되었습니다.";
+
+                // Group 확정 및 삭제 처리
+                updatedGroup.confirm();
+                updatedGroup.delete();
+
+                groupRepository.save(updatedGroup);
+
+                // 호스트 알림 발송
+                sseService.sendGroupNotification(updatedGroup.getMember().getEmail(),
+                        GroupNotification.from(updatedGroup, message, NotificationType.GROUP_CANCEL, LocalDateTime.now()));
+            }
+
+
             // 모일 수 있는 시간이 없다면, 모두에게 모일 수 없다는 알림 발송
-            if (recommendEvents.isEmpty()){
-                message = groupTitle + " 모임이 가능한 일정이 없습니다. 다른 날짜로 모임을 다시 생성해주세요.";
+            else if (recommendEvents.isEmpty()){
+                message = groupTitle + " 모임이 가능한 일정이 없어 취소되었습니다.";
 
                 // Group 확정 및 삭제 처리
                 updatedGroup.confirm();
@@ -569,5 +586,24 @@ public class GroupService {
 
         return FindConfirmedGroupResponse.from(groupRepository.save(group));
 
+    }
+
+    public FindConfirmedGroupResponse cancel(Long groupId) throws JsonProcessingException {
+        Group group = groupRepository.findById(groupId).orElseThrow(GroupNotFoundException::new);
+        group.confirm();
+        group.delete();
+
+        String message = group.getTitle() + " 모임이 호스트에 의해서 취소되었습니다.";
+
+        // 모임을 수락한 참여자 리스트 가져오기
+        List<GroupInfo> agreedParticipants =
+                groupInfoRepository.findByGroupAndIsAgreed(group, "Y");
+
+        // 알림 발송
+        for (GroupInfo agreedParticipant : agreedParticipants){
+            sseService.sendGroupNotification(agreedParticipant.getMember().getEmail(),
+                    GroupNotification.from(group, message, NotificationType.GROUP_CANCEL, LocalDateTime.now()));
+        }
+        return FindConfirmedGroupResponse.from(groupRepository.save(group));
     }
 }

@@ -17,6 +17,7 @@ public class FindConfirmedGroupResponse {
     private List<GroupInfoResponse> groupInfos;
     private String place;
     private LocalDateTime confirmedDate;
+    private String isDeleted;
     private int runningTime;
     private String contents;
     private String filePath;
@@ -33,6 +34,7 @@ public class FindConfirmedGroupResponse {
         return FindConfirmedGroupResponse.builder()
                 .id(group.getId())
                 .isConfirmed(group.getIsConfirmed())
+                .isDeleted(group.getIsDeleted())
                 .title(group.getTitle())
                 .groupInfos(groupInfos)
                 .place(group.getPlace())

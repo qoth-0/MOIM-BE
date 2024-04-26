@@ -13,7 +13,6 @@ public class EventRequest {
     @NotEmpty(message = "제목이 비어있으면 안됩니다.")
     private String title;
 
-    @NotEmpty(message = "내용이 비어있으면 안됩니다.")
     private String memo;
 
     @NotEmpty(message = "시작일자가 비어있으면 안됩니다.")
