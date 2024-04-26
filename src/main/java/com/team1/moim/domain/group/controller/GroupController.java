@@ -163,5 +163,20 @@ public class GroupController {
                         groupService.confirm(groupId, confirmDay)));
     }
 
+    // 모임 취소 - 호스트
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @PostMapping("/{groupId}/cancel")
+    public ResponseEntity<ApiSuccessResponse<FindConfirmedGroupResponse>> cancel(HttpServletRequest httpServletRequest,
+                                                                                  @PathVariable("groupId") Long groupId
+    ) throws JsonProcessingException {
+        log.info("모임 취소 API 시작");
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiSuccessResponse.of(
+                        HttpStatus.OK,
+                        httpServletRequest.getServletPath(),
+                        groupService.cancel(groupId)));
+    }
+
 
 }
