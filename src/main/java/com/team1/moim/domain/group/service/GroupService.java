@@ -7,7 +7,6 @@ import com.team1.moim.domain.event.repository.EventRepository;
 import com.team1.moim.domain.group.dto.request.GroupAlarmRequest;
 import com.team1.moim.domain.group.dto.request.GroupInfoRequest;
 import com.team1.moim.domain.group.dto.request.GroupRequest;
-import com.team1.moim.domain.group.dto.request.GroupSearchRequest;
 import com.team1.moim.domain.group.dto.response.FindConfirmedGroupResponse;
 import com.team1.moim.domain.group.dto.response.FindPendingGroupResponse;
 import com.team1.moim.domain.group.dto.response.GroupDetailResponse;
@@ -26,24 +25,16 @@ import com.team1.moim.domain.member.exception.MemberNotFoundException;
 import com.team1.moim.domain.member.repository.MemberRepository;
 import com.team1.moim.domain.group.dto.response.VoteResponse;
 import com.team1.moim.domain.notification.NotificationType;
-import com.team1.moim.domain.notification.dto.NotificationResponseNew;
-import com.team1.moim.domain.notification.exception.NotificationNotFoundException;
 import com.team1.moim.global.config.redis.RedisService;
 import com.team1.moim.global.config.s3.S3Service;
 import com.team1.moim.domain.notification.dto.GroupNotification;
 import com.team1.moim.global.config.sse.service.SseService;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
 
 import java.util.*;
-import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -215,13 +206,10 @@ public class GroupService {
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
 
         List<GroupInfo> guestGroupInfo = groupInfoRepository.findByMemberId(member.getId()); // 자기가 게스트인 그룹의 인포
-        List<Group> groups = groupRepository.findByMemberIdAndIsDeleted(member.getId(), "N"); // 자기가 호스트인 그룹
+        List<Group> groups = groupRepository.findByMemberId(member.getId()); // 자기가 호스트인 그룹
 
         for (GroupInfo groupInfo : guestGroupInfo){
-            if(groupInfo.getGroup().getIsDeleted().equals("N")){
-                groups.add(groupInfo.getGroup());
-            }
-
+            groups.add(groupInfo.getGroup());
         }
         // 자기가 속한 모든 그룹 = groups
 
