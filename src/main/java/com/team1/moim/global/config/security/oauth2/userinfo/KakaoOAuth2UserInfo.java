@@ -1,7 +1,10 @@
 package com.team1.moim.global.config.security.oauth2.userinfo;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Map;
 
+@Slf4j
 public class KakaoOAuth2UserInfo extends OAuth2UserInfo{
 
     public KakaoOAuth2UserInfo(Map<String, Object> attributes){
@@ -47,5 +50,16 @@ public class KakaoOAuth2UserInfo extends OAuth2UserInfo{
         }
 
         return (String) profile.get("thumbnail_image_url");
+    }
+    @Override
+    public String getEmail() {
+        Map<String, Object> account = (Map<String, Object>) attributes.get("kakao_account");
+
+        log.info("카카오에서 가져온 계정 정보: {}", account);
+        if (account == null) {
+            return null;
+        }
+
+        return (String) account.get("email");
     }
 }
