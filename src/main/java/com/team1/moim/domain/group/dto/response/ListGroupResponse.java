@@ -2,6 +2,7 @@ package com.team1.moim.domain.group.dto.response;
 
 import com.team1.moim.domain.group.entity.Group;
 import com.team1.moim.domain.group.entity.GroupInfo;
+import com.team1.moim.domain.group.entity.GroupType;
 import com.team1.moim.domain.member.entity.Member;
 
 import java.time.LocalDate;
@@ -33,8 +34,9 @@ public class ListGroupResponse {
     private String hostEmail;
     private String hostNickname;
     private List<String[]> guestEmailNicknameIsAgreed;
+    private GroupType groupType;
 
-
+//cat
 
     public static ListGroupResponse from(Group group,List<String[]> guestEmailNicknameIsAgreed) {
         return ListGroupResponse.builder()
@@ -56,6 +58,7 @@ public class ListGroupResponse {
                 .hostEmail(group.getMember().getEmail())
                 .hostNickname(group.getMember().getNickname())
                 .guestEmailNicknameIsAgreed(guestEmailNicknameIsAgreed)
+                .groupType(group.getGroupType())
                 .build();
     }
 }
