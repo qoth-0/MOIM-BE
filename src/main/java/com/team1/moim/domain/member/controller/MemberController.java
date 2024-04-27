@@ -1,6 +1,5 @@
 package com.team1.moim.domain.member.controller;
 
-import com.team1.moim.domain.auth.dto.request.SignUpRequest;
 import com.team1.moim.domain.member.dto.request.UpdateRequest;
 import com.team1.moim.domain.member.dto.response.MemberResponse;
 import com.team1.moim.domain.member.service.MemberService;

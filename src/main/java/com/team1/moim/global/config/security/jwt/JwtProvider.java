@@ -44,7 +44,7 @@ public class JwtProvider {
 
     private static final String ACCESS_TOKEN_SUBJECT = "AccessToken";
     private static final String REFRESH_TOKEN_SUBJECT = "RefreshToken";
-    private static final String EMAIL_CLAIM = "email";
+    private static final String NICKNAME_CLAIM = "nickname";
     private static final String ROLE_CLAIM = "role";
     private static final String BEARER = "Bearer ";
 
@@ -60,7 +60,7 @@ public class JwtProvider {
         return JWT.create() // JWT 토큰을 생성하는 빌더 생성
                 .withSubject(ACCESS_TOKEN_SUBJECT)
                 .withExpiresAt(new Date(now.getTime() + accessTokenExpiration))
-                .withClaim(EMAIL_CLAIM, email) // 사용자 정의 클레임
+                .withClaim(NICKNAME_CLAIM, email) // 사용자 정의 클레임
                 .withClaim(ROLE_CLAIM, role)
                 .sign(Algorithm.HMAC512(secretKey)); // HMAC512 알고리즘 사용하여 secret 키로 암호화
     }
@@ -108,6 +108,7 @@ public class JwtProvider {
     public void sendAccessAndRefreshToken(HttpServletResponse response,
                                           String accessToken,
                                           String refreshToken) throws IOException {
+        log.info("Access Token이랑 Refresh Token을 보내는 함수 진입!");
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("application/json");
         response.setCharacterEncoding("utf-8");
@@ -148,6 +149,19 @@ public class JwtProvider {
                 .map(accessToken -> accessToken.replace(BEARER, ""));
     }
 
+    public Optional<String> extractNickname(String accessToken) throws IOException {
+        log.info("extractEmail() 진입 / 이메일 추출 시작");
+        try {
+            return Optional.ofNullable(JWT.require(Algorithm.HMAC512(secretKey))
+                    .build() // 반환된 빌더로 JWT verifier 생성
+                    .verify(accessToken) // accessToken을 검증하고 유효하지 않다면 예외 발생
+                    .getClaim(NICKNAME_CLAIM) // claim(nickname) 가져오기
+                    .asString());
+        } catch (Exception e){
+            throw new JwtExpiredException();
+        }
+    }
+
     /**
      * AccessToken에서 Role 추출
      * 추출 전에 JWT.require()로 검증기 생성
@@ -157,19 +171,6 @@ public class JwtProvider {
      * 같은 방식으로 디코딩 후 DB에 있는 role과의 일치 여부를 확인하는 메서드
      * 에러 발생 시 401 UNAUTHORIZED 에러 발생
      */
-    public Optional<String> extractEmail(String accessToken) throws IOException {
-        log.info("extractEmail() 진입 / 이메일 추출 시작");
-        try {
-            return Optional.ofNullable(JWT.require(Algorithm.HMAC512(secretKey))
-                    .build() // 반환된 빌더로 JWT verifier 생성
-                    .verify(accessToken) // accessToken을 검증하고 유효하지 않다면 예외 발생
-                    .getClaim(EMAIL_CLAIM) // claim(email) 가져오기
-                    .asString());
-        } catch (Exception e){
-            throw new JwtExpiredException();
-        }
-    }
-
     public Optional<String> extractRole(String accessToken) {
         try {
             return Optional.ofNullable(JWT.require(Algorithm.HMAC512(secretKey))
@@ -179,22 +180,6 @@ public class JwtProvider {
                     .asString());
         } catch (Exception e){
             throw new JwtAccessDeniedException();
-        }
-    }
-
-    /**
-     * 생성된 RefreshToken을 해당 유저의 DB에 추가
-     * Oauth 로그인 성공 시 처리하는 LoginSuccessHandler에서 사용할 예정
-     */
-    public void updateRefreshToken(String email, String refreshToken){
-        log.info("updateRefreshToken() 진입");
-        try {
-            Member findMember = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
-            findMember.updateRefreshToken(refreshToken);
-            memberRepository.saveAndFlush(findMember); // DB에 Refresh Token 저장
-            log.info("Refresh Token 갱신");
-        } catch (Exception e){
-            throw new MemberNotFoundException();
         }
     }
 

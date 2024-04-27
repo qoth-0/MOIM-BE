@@ -6,7 +6,7 @@ import com.team1.moim.domain.member.exception.MemberNotFoundException;
 import com.team1.moim.domain.member.repository.MemberRepository;
 import com.team1.moim.global.config.security.jwt.exception.JwtExpiredException;
 import com.team1.moim.global.config.security.jwt.exception.RefreshTokenNotFoundException;
-import com.team1.moim.global.config.security.oauth2.util.PasswordUtil;
+import com.team1.moim.global.config.security.PasswordUtil;
 import com.team1.moim.global.exception.ErrorCode;
 import com.team1.moim.global.exception.ErrorDetail;
 import jakarta.servlet.FilterChain;
@@ -36,10 +36,14 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
     // 아래 url로 들어오는 요청은 Filter 작동 X
     private static final String[] NO_CHECK_URLS = {
+            "/",
             "/login",
+            "/oauth2/authorize/google",
+            "/oauth2/authorize/kakao",
             "/oauth2/authorization/google",
+            "/oauth2/authorization/kakao",
             "/login/oauth2/code/google",
-            "/favicon.ico",
+            "/login/oauth2/code/kakao",
             "/api/auth/sign-up",
             "/api/auth/send",
             "/api/auth/verify",
@@ -105,7 +109,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
      */
     public void reissueAccessToken(HttpServletResponse response, Member member) throws IOException {
         log.info("Access Token 재발급 시작!");
-        String reissuedAccessToken = jwtProvider.createAccessToken(member.getEmail(), member.getRole().name());
+        String reissuedAccessToken = jwtProvider.createAccessToken(member.getNickname(), member.getRole().name());
         jwtProvider.sendAccessToken(response, reissuedAccessToken);
     }
 
@@ -120,8 +124,8 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
         String accessTokenFromHeader = jwtProvider.extractAccessToken(request).orElse(null);
         jwtProvider.validateToken(accessTokenFromHeader);
-        String email = jwtProvider.extractEmail(accessTokenFromHeader).orElse(null);
-        Member findMember = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+        String nickname = jwtProvider.extractNickname(accessTokenFromHeader).orElse(null);
+        Member findMember = memberRepository.findByNickname(nickname).orElseThrow(MemberNotFoundException::new);
         saveAuthentication(findMember);
 
         log.info("Authentication 객체에 대한 인증 허가 처리 완료");

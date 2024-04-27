@@ -1,5 +1,6 @@
 package com.team1.moim.domain.auth.dto.request;
 
+import com.team1.moim.domain.member.entity.LoginType;
 import com.team1.moim.domain.member.entity.Member;
 import com.team1.moim.domain.member.entity.Role;
 import jakarta.validation.constraints.Email;
@@ -24,6 +25,7 @@ public class SignUpRequest {
 
     public Member toEntity(PasswordEncoder passwordEncoder, Role role, String imageUrl){
         String finalPassword = null;
+
         if (password != null){
             finalPassword = passwordEncoder.encode(password);
         }
@@ -33,9 +35,8 @@ public class SignUpRequest {
                 .password(finalPassword)
                 .nickname(nickname)
                 .profileImage(imageUrl)
+                .loginType(LoginType.NORMAL)
                 .role(role)
-                .socialType(null)
-                .socialId(null)
                 .build();
     }
 }

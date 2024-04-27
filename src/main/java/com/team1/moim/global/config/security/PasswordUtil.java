@@ -1,4 +1,4 @@
-package com.team1.moim.global.config.security.oauth2.util;
+package com.team1.moim.global.config.security;
 
 import lombok.extern.slf4j.Slf4j;
 
