@@ -13,7 +13,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +23,6 @@ public class MemberService {
 
     private static final String FILE_TYPE = "members";
     private final S3Service s3Service;
-
     private final MemberRepository memberRepository;
 
     @Transactional
@@ -32,7 +30,7 @@ public class MemberService {
         Member findMember = findMember();
         findMember.withdraw();
 
-        return findMember.getEmail() + " 회원을 삭제하였습니다.";
+        return findMember.getNickname() + " 회원을 삭제하였습니다.";
     }
 
     @Transactional
