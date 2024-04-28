@@ -2,25 +2,26 @@ package com.team1.moim.global.config.security.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.SignatureVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.team1.moim.domain.member.entity.Member;
-import com.team1.moim.domain.member.exception.MemberNotFoundException;
 import com.team1.moim.domain.member.repository.MemberRepository;
 import com.team1.moim.global.config.security.jwt.exception.JwtAccessDeniedException;
 import com.team1.moim.global.config.security.jwt.exception.JwtExpiredException;
+import com.team1.moim.global.exception.UnauthorizedException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
@@ -191,5 +192,21 @@ public class JwtProvider {
     public void validateToken(String token){
         log.info("validateToken() 진입! 토큰 유효성 검증 시작!");
         JWT.require(Algorithm.HMAC512(secretKey)).build().verify(token);
+    }
+
+    /**
+     * 웹소켓 연결 시 헤더의 JWT TOKEN 유효성 검증에서 사용한다. 사실 위의 것 그대로 써도 될 것 같은데 우선 만들고 테스트해본다.
+     */
+    public void validateWebSocketToken(String token) {
+        log.info("validateWebSocketToken() 진입! 웹소켓 연결 시 헤더의 토큰 유효성 검증 시작!");
+        try {
+            JWT.require(Algorithm.HMAC512(secretKey)).build().verify(token);
+        } catch (TokenExpiredException e) {
+            throw UnauthorizedException.of(e.getClass().getName(), "만료된 JWT 토큰입니다.");
+        } catch (SignatureVerificationException e) {
+            throw UnauthorizedException.of(e.getClass().getName(),"잘못된 JWT 서명입니다.");
+        } catch (JWTVerificationException e) {
+            throw UnauthorizedException.of(e.getClass().getName(),"JWT 토큰이 잘못되었습니다.");
+        }
     }
 }
