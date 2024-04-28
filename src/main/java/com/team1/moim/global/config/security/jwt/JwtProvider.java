@@ -55,12 +55,12 @@ public class JwtProvider {
      * AccessToken 생성 메서드
      * Payload에 email과 role 정보 넣어서 생성
      */
-    public String createAccessToken(String email, String role){
+    public String createAccessToken(String nickname, String role){
         Date now = new Date();
         return JWT.create() // JWT 토큰을 생성하는 빌더 생성
                 .withSubject(ACCESS_TOKEN_SUBJECT)
                 .withExpiresAt(new Date(now.getTime() + accessTokenExpiration))
-                .withClaim(NICKNAME_CLAIM, email) // 사용자 정의 클레임
+                .withClaim(NICKNAME_CLAIM, nickname) // 사용자 정의 클레임
                 .withClaim(ROLE_CLAIM, role)
                 .sign(Algorithm.HMAC512(secretKey)); // HMAC512 알고리즘 사용하여 secret 키로 암호화
     }

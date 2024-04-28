@@ -1,6 +1,7 @@
 package com.team1.moim.global.config.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.team1.moim.domain.member.repository.AccountRepository;
 import com.team1.moim.domain.member.repository.MemberRepository;
 import com.team1.moim.global.config.security.jwt.JwtAuthenticationProcessingFilter;
 import com.team1.moim.global.config.security.jwt.JwtProvider;
@@ -56,6 +57,7 @@ public class SecurityConfig {
     private final LoginService loginService;
     private final JwtProvider jwtProvider;
     private final MemberRepository memberRepository;
+    private final AccountRepository accountRepository;
     private final ObjectMapper objectMapper;
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
     private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
@@ -132,7 +134,7 @@ public class SecurityConfig {
 
     @Bean
     public LoginSuccessHandler loginSuccessHandler() {
-        return new LoginSuccessHandler(jwtProvider, memberRepository);
+        return new LoginSuccessHandler(jwtProvider, memberRepository, accountRepository);
     }
 
     @Bean

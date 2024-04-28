@@ -36,7 +36,6 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
     // 아래 url로 들어오는 요청은 Filter 작동 X
     private static final String[] NO_CHECK_URLS = {
-            "/",
             "/login",
             "/oauth2/authorize/google",
             "/oauth2/authorize/kakao",

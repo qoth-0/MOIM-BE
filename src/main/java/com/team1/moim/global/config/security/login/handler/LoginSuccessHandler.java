@@ -1,7 +1,11 @@
 package com.team1.moim.global.config.security.login.handler;
 
+import com.team1.moim.domain.member.entity.Account;
 import com.team1.moim.domain.member.entity.LoginType;
+import com.team1.moim.domain.member.entity.Member;
+import com.team1.moim.domain.member.exception.AccountNotFoundException;
 import com.team1.moim.domain.member.exception.MemberNotFoundException;
+import com.team1.moim.domain.member.repository.AccountRepository;
 import com.team1.moim.domain.member.repository.MemberRepository;
 import com.team1.moim.global.config.security.jwt.JwtProvider;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 
@@ -27,11 +32,13 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JwtProvider jwtProvider;
     private final MemberRepository memberRepository;
+    private final AccountRepository accountRepository;
 
     @Value("${jwt.access.expiration}")
     private String accessTokenExpiration;
 
     @Override
+    @Transactional
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
                                         Authentication authentication) throws IOException {
@@ -40,20 +47,16 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         String role = memberRepository.findByEmail(email)
                 .orElseThrow(MemberNotFoundException::new)
                 .getRole().name();
-        String accessToken = jwtProvider.createAccessToken(email, role);
+        Account findAccount = accountRepository.findByEmail(email).orElseThrow(AccountNotFoundException::new);
+        Member findMember = findAccount.getMember();
+        String accessToken = jwtProvider.createAccessToken(findMember.getNickname(), role);
         String refreshToken = jwtProvider.createRefreshToken();
 
         jwtProvider.sendAccessAndRefreshToken(response, accessToken, refreshToken);
 
-        memberRepository.findByEmail(email)
-                        .ifPresent(member -> {
-                            member.updateRefreshToken(refreshToken);
-                            member.updateRepresentativeData(
-                                    member.getEmail(),
-                                    member.getProfileImage(),
-                                    LoginType.NORMAL);
-                            memberRepository.saveAndFlush(member);
-                        });
+        findMember.updateRefreshToken(refreshToken);
+        findMember.updateRepresentativeData(findAccount.getEmail(), findAccount.getProfileImage(), LoginType.NORMAL);
+        memberRepository.saveAndFlush(findMember);
 
         log.info("로그인에 성공하였습니다. 이메일 : {}", email);
         log.info("로그인에 성공하였습니다. AccessToken : {}", accessToken);
