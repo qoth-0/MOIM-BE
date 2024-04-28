@@ -3,6 +3,7 @@ package com.team1.moim.global.config.security.login.filter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -19,6 +20,7 @@ import java.util.Map;
  * Spring Security Form Login 기반의 UsernamePasswordAuthenticationFilter를 참고하여 만든 커스텀 필터
  * "/login" 요청 왔을 때, JSON 값을 매핑 처리하는 필터 작동
  */
+@Slf4j
 public class CustomJsonUsernamePasswordAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
     private static final String DEFAULT_LOGIN_REQUEST_URL = "/login"; // "/login"으로 오는 요청을 처리
@@ -47,6 +49,7 @@ public class CustomJsonUsernamePasswordAuthenticationFilter extends AbstractAuth
     public Authentication attemptAuthentication(HttpServletRequest request,
                                                 HttpServletResponse response)
                                                     throws AuthenticationException, IOException {
+        log.info("1. attemptAuthentication 진입");
         if (request.getContentType() == null || !request.getContentType().equals(CONTENT_TYPE)) {
             throw new AuthenticationServiceException("Authentication Content-Type not supported: "
                                                         + request.getContentType());
@@ -56,9 +59,11 @@ public class CustomJsonUsernamePasswordAuthenticationFilter extends AbstractAuth
         // 요청 JSON example
         //  {"email" : "user@naver.com", "password" : "user1234@"}
         String messageBody = StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8);
+        log.info("2. 요청 헤더의 Message Body: {}", messageBody);
 
         // 꺼낸 messageBody를 objectMapper.readValue()로 Map으로 변환 (Key : JSON의 키 -> email, password)
         Map<String, String> usernamePasswordMap = objectMapper.readValue(messageBody, Map.class);
+        log.info("3. usernamePasswordMap: {}", usernamePasswordMap);
 
         // Map의 Key(email, password)로 해당 이메일, 패스워드 추출
         String email = usernamePasswordMap.get(USERNAME_KEY);
@@ -70,6 +75,7 @@ public class CustomJsonUsernamePasswordAuthenticationFilter extends AbstractAuth
         // DaoAuthenticationProvider는 UserDetailsService의 loadUserByUsername을 호출하여
         // UserDetails 객체를 반환 받음 -> LoginService에서 추가 설명
         UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(email, password);
+        log.info("4. authRequest: {}", authRequest);
 
         return this.getAuthenticationManager().authenticate(authRequest);
     }
