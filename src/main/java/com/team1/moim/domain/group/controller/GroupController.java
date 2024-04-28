@@ -105,17 +105,17 @@ public class GroupController {
 
     // 모임 리스트 조회
     @PreAuthorize("hasRole('ROLE_USER')")
-    @GetMapping("/groups")
+    @GetMapping("/groups/{pageNum}")
     public ResponseEntity<ApiSuccessResponse<List<ListGroupResponse>>> findAllGroups(
             HttpServletRequest httpServletRequest,
-            Pageable pageable) {
+            @PathVariable("pageNum") int pageNum) {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ApiSuccessResponse.of(
                         HttpStatus.OK,
                         httpServletRequest.getServletPath(),
-                        groupService.findGroups(pageable)));
+                        groupService.findGroups(pageNum)));
     }
 
     @PostMapping("/{groupId}/groupInfo/{groupInfoId}/notification")
