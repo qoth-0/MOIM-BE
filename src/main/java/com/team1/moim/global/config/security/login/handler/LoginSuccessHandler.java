@@ -1,5 +1,6 @@
 package com.team1.moim.global.config.security.login.handler;
 
+import com.team1.moim.domain.member.entity.LoginType;
 import com.team1.moim.domain.member.exception.MemberNotFoundException;
 import com.team1.moim.domain.member.repository.MemberRepository;
 import com.team1.moim.global.config.security.jwt.JwtProvider;
@@ -47,6 +48,10 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         memberRepository.findByEmail(email)
                         .ifPresent(member -> {
                             member.updateRefreshToken(refreshToken);
+                            member.updateRepresentativeData(
+                                    member.getEmail(),
+                                    member.getProfileImage(),
+                                    LoginType.NORMAL);
                             memberRepository.saveAndFlush(member);
                         });
 

@@ -4,6 +4,8 @@ import com.team1.moim.domain.auth.dto.request.SignUpRequest;
 import com.team1.moim.domain.auth.exception.CodeNotMatchException;
 import com.team1.moim.domain.auth.exception.NotFoundCodeException;
 import com.team1.moim.domain.member.dto.response.MemberResponse;
+import com.team1.moim.domain.member.entity.Account;
+import com.team1.moim.domain.member.entity.LoginType;
 import com.team1.moim.domain.member.entity.Member;
 import com.team1.moim.domain.member.entity.Role;
 import com.team1.moim.domain.member.exception.EmailDuplicationException;
@@ -42,19 +44,30 @@ public class AuthService {
 
     @Transactional
     public MemberResponse signUp(SignUpRequest request) {
+
         if (memberRepository.findByNickname(request.getNickname()).isPresent()) {
             throw new NicknameDuplicateException();
         }
         if (memberRepository.findByEmail(request.getEmail()).isPresent()){
             throw new EmailDuplicationException();
         }
+
         String imageUrl;
         if (request.getProfileImage() != null && !request.getProfileImage().isEmpty()){
             imageUrl = s3Service.uploadFile(FILE_TYPE, request.getProfileImage());
         } else {
             imageUrl = s3Service.getDefaultImage(FILE_TYPE);
         }
+
+        Account account = Account.builder()
+                .email(request.getEmail())
+                .profileImage(imageUrl)
+                .socialId(null)
+                .loginType(LoginType.NORMAL)
+                .build();
+
         Member newMember = request.toEntity(passwordEncoder, Role.USER, imageUrl);
+        account.attachMember(newMember);
 
         return MemberResponse.from(memberRepository.save(newMember));
     }

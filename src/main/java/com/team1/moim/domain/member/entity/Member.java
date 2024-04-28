@@ -20,7 +20,7 @@ public class Member extends BaseTimeEntity {
     private Long id;
 
     @Column(unique = true, nullable = false)
-    private String email;
+    private String email; // 대표 이메일
 
     // 소셜 로그인 유저의 경우 비밀번호가 필요 없으므로, nullable
     private String password;
@@ -29,7 +29,10 @@ public class Member extends BaseTimeEntity {
     private String nickname;
 
     @Column(nullable = false)
-    private String profileImage;
+    private String profileImage; // 대표 프로필 이미지
+
+    @Enumerated(EnumType.STRING)
+    private LoginType loginType; // 대표 로그인 타입
 
     private String refreshToken;
 
@@ -37,35 +40,41 @@ public class Member extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Enumerated(EnumType.STRING)
-    private SocialType socialType = null;
-
-    private String socialId = null; // 로그인 한 소셜 타입의 식별자 값 (일반 로그인은 null)
-
     @Column(nullable = false)
     private String deleteYn = "N";
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Account> accounts = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Event> events = new ArrayList<>();
 
     @Builder
-    public Member(String email, String password, String nickname,
-                  String profileImage, Role role, SocialType socialType, String socialId) {
+    public Member(String email, String password, String nickname, String profileImage, LoginType loginType, Role role) {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
         this.profileImage = profileImage;
+        this.loginType = loginType;
         this.role = role;
-        this.socialType = socialType;
-        this.socialId = socialId;
     }
 
     public void withdraw() {
         this.deleteYn = "Y";
     }
 
+    public void authorizeUser(){
+        this.role = Role.USER;
+    }
+
     public void updateRefreshToken(String refreshToken){
         this.refreshToken = refreshToken;
+    }
+
+    public void updateRepresentativeData(String email, String profileImage, LoginType loginType){
+        this.email = email;
+        this.profileImage = profileImage;
+        this.loginType = loginType;
     }
 
     public void updateMember(String nickname, String profileImage){

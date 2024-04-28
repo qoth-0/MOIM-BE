@@ -135,9 +135,95 @@ public class GroupService {
     @Transactional
     @Scheduled(cron = "0 0/1 * * * *")
     public void scheduleGroupAlarm() throws JsonProcessingException {
-        // 삭제되지 않은 그룹 리스트를 검색
-        List<Group> groups = groupRepository.findByIsDeleted("N");
+        // 확정되지 않은 그룹 리스트를 검색
+        List<Group> groups = groupRepository.findByIsConfirmed("N");
         for (Group group : groups) {
+
+            // 마감 시간이 도달한 그룹 확정 및 알림 전송
+            if(group.getVoteDeadline().isBefore(LocalDateTime.now())) {
+
+                List<GroupInfo> participants =
+                        groupInfoRepository.findByGroupAndIsAgreed(group, "Y");
+
+                String message;
+                String groupTitle = group.getTitle();
+
+                // 참여자가 없을 경우 호스트에게만 취소 알림
+                if (participants.isEmpty()) {
+                    message = groupTitle + " 모임이 참여자가 없어 취소되었습니다.";
+
+                    // Group 확정 및 삭제 처리
+                    group.confirm();
+                    group.delete();
+
+                    groupRepository.save(group);
+
+                    // 호스트 알림 발송
+                    sseService.sendGroupNotification(group.getMember().getEmail(),
+                            GroupNotification.from(group, message, NotificationType.GROUP_CANCEL, LocalDateTime.now()));
+
+                } else {
+                    // 참여자가 있을 경우
+
+                    // 모임 일정 자동 추천 로직 실행 후 추천 일정 리스트 가져오기
+                    List<LocalDateTime> recommendEvents = recommendGroupSchedule(group);
+                    log.info("추천 일정: " + recommendEvents);
+                    recommendEvents.forEach(recommendEvent -> {
+                        try {
+                            redisService.setAvailableList(group.getId().toString(), recommendEvent);
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                    log.info("추천일정 redis 저장완료");
+
+                    // 모일 수 있는 시간이 없다면, 모두에게 모일 수 없다는 알림 발송
+                    if (recommendEvents.isEmpty()) {
+                        message = groupTitle + " 모임이 가능한 일정이 없어 취소되었습니다.";
+
+                        // Group 확정 및 삭제 처리
+                        group.confirm();
+                        group.delete();
+
+                        groupRepository.save(group);
+
+                        // 호스트도 알림 발송
+                        sseService.sendGroupNotification(group.getMember().getEmail(),
+                                GroupNotification.from(group, message, NotificationType.GROUP_CANCEL, LocalDateTime.now()));
+
+                        for (GroupInfo agreedParticipant : participants) {
+                            sseService.sendGroupNotification(agreedParticipant.getMember().getEmail(),
+                                    GroupNotification.from(group, message, NotificationType.GROUP_CANCEL, LocalDateTime.now()));
+                        }
+
+                        // 모일 수 있는 일정이 1개라면 자동으로 모임을 확정 짓고 모두에게 알림 전송
+                    } else if (recommendEvents.size() == 1) {
+                        message = groupTitle + " 모임이 확정 되었습니다. 일정을 확인해보세요!";
+
+                        // Group 확정 처리
+                        group.confirm();
+                        group.setConfirmedDateTime(recommendEvents.get(0));
+                        groupRepository.save(group);
+
+                        // 호스트도 알림 발송
+                        sseService.sendGroupNotification(group.getMember().getEmail(),
+                                GroupNotification.from(group, message, NotificationType.GROUP_CONFIRM, LocalDateTime.now()));
+
+                        for (GroupInfo agreedParticipant : participants) {
+                            sseService.sendGroupNotification(agreedParticipant.getMember().getEmail(),
+                                    GroupNotification.from(group, message, NotificationType.GROUP_CONFIRM, LocalDateTime.now()));
+                        }
+                        // 추천 일정이 여러개라면 모임 확정 알림을 호스트 에게만 전송
+                    } else {
+                        message = groupTitle + " 모임을 확정해주세요.";
+
+                        // 호스트한테만 알림 발송
+                        sseService.sendGroupNotification(group.getMember().getEmail(),
+                                GroupNotification.from(group, message, NotificationType.GROUP_CHOICE, LocalDateTime.now()));
+                    }
+                }
+            }
+
             // 모임 알림 중에서 스케줄러가 필요한 알림은 데드라인 마감 알림 밖에 없다.
             // 그 중에서 아직 알림을 보내지 않은 것을 선택한다.
             List<GroupAlarm> groupAlarms = groupAlarmRepository
@@ -176,6 +262,7 @@ public class GroupService {
         Group group = groupRepository.findById(id).orElseThrow(GroupNotFoundException::new);
         group.delete();
         group.updateGroupType(GroupType.GROUP_CANCEL);
+        group.confirm();
         for (GroupInfo groupInfo : groupInfoRepository.findByGroup(group)) {
             groupInfo.delete();
         }
