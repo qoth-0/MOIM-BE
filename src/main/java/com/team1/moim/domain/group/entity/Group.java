@@ -84,10 +84,15 @@ public class Group extends BaseTimeEntity {
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<GroupAlarm> groupAlarms = new ArrayList<>();
 
+    // 그룹타입
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private GroupType groupType = GroupType.valueOf("GROUP_CREATE");
+
     @Builder
     public Group(Member member, String title, String contents, int runningTime, LocalDate expectStartDate,
                  LocalDate expectEndDate, LocalTime expectStartTime, LocalTime expectEndTime,
-                 String place, LocalDateTime voteDeadline, LocalDateTime confirmedDateTime, int participants) {
+                 String place, LocalDateTime voteDeadline, LocalDateTime confirmedDateTime, int participants, GroupType groupType) {
         this.member = member;
         this.title = title;
         this.contents = contents;
@@ -100,6 +105,7 @@ public class Group extends BaseTimeEntity {
         this.voteDeadline = voteDeadline;
         this.confirmedDateTime = confirmedDateTime;
         this.participants = participants;
+        this.groupType = groupType;
     }
 
     public void delete() {
@@ -112,5 +118,9 @@ public class Group extends BaseTimeEntity {
 
     public void setConfirmedDateTime(LocalDateTime confirmedDateTime){
         this.confirmedDateTime = confirmedDateTime;
+    }
+
+    public void updateGroupType(GroupType groupType){
+        this.groupType = groupType;
     }
 }

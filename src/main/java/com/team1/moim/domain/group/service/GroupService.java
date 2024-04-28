@@ -11,10 +11,7 @@ import com.team1.moim.domain.group.dto.response.FindConfirmedGroupResponse;
 import com.team1.moim.domain.group.dto.response.FindPendingGroupResponse;
 import com.team1.moim.domain.group.dto.response.GroupDetailResponse;
 import com.team1.moim.domain.group.dto.response.ListGroupResponse;
-import com.team1.moim.domain.group.entity.Group;
-import com.team1.moim.domain.group.entity.GroupAlarm;
-import com.team1.moim.domain.group.entity.GroupAlarmTimeType;
-import com.team1.moim.domain.group.entity.GroupInfo;
+import com.team1.moim.domain.group.entity.*;
 import com.team1.moim.domain.group.exception.*;
 import com.team1.moim.domain.group.repository.GroupAlarmRepository;
 import com.team1.moim.domain.group.repository.GroupInfoRepository;
@@ -78,7 +75,7 @@ public class GroupService {
             }
         }
 
-        Group newGroup = groupRequest.toEntity(host, groupInfoRequests);
+        Group newGroup = groupRequest.toEntity(host, groupInfoRequests, GroupType.GROUP_CREATE);
         for (GroupInfoRequest groupInfoRequest : groupInfoRequests) {
             log.info("참여자 존재여부 확인");
             Member participant = memberRepository.findByEmail(groupInfoRequest.getMemberEmail())
@@ -264,6 +261,7 @@ public class GroupService {
     public void delete(Long id) {
         Group group = groupRepository.findById(id).orElseThrow(GroupNotFoundException::new);
         group.delete();
+        group.updateGroupType(GroupType.GROUP_CANCEL);
         group.confirm();
         for (GroupInfo groupInfo : groupInfoRepository.findByGroup(group)) {
             groupInfo.delete();
@@ -367,6 +365,7 @@ public class GroupService {
                 // Group 확정 및 삭제 처리
                 updatedGroup.confirm();
                 updatedGroup.delete();
+                updatedGroup.updateGroupType(GroupType.GROUP_CANCEL);
 
                 groupRepository.save(updatedGroup);
 
@@ -383,6 +382,7 @@ public class GroupService {
                 // Group 확정 및 삭제 처리
                 updatedGroup.confirm();
                 updatedGroup.delete();
+                updatedGroup.updateGroupType(GroupType.GROUP_CANCEL);
 
                 groupRepository.save(updatedGroup);
 
@@ -402,6 +402,7 @@ public class GroupService {
                 // Group 확정 처리
                 updatedGroup.confirm();
                 updatedGroup.setConfirmedDateTime(recommendEvents.get(0));
+                updatedGroup.updateGroupType(GroupType.GROUP_CONFIRM);
                 groupRepository.save(updatedGroup);
 
                 // 호스트도 알림 발송
@@ -415,7 +416,7 @@ public class GroupService {
                 // 추천 일정이 여러개라면 모임 확정 알림을 호스트 에게만 전송
             } else {
                 message = groupTitle + " 모임을 확정해주세요.";
-
+                updatedGroup.updateGroupType(GroupType.GROUP_CHOICE);
                 // 호스트한테만 알림 발송
                 sseService.sendGroupNotification(updatedGroup.getMember().getEmail(),
                         GroupNotification.from(updatedGroup, message, NotificationType.GROUP_CHOICE, LocalDateTime.now()));
@@ -642,7 +643,8 @@ public class GroupService {
         Group group = groupRepository.findById(groupId).orElseThrow(GroupNotFoundException::new);
         group.confirm();
         group.setConfirmedDateTime(LocalDateTime.parse(confirmDay));
-
+        group.updateGroupType(GroupType.GROUP_CONFIRM);
+        log.info("확정된 날짜 " + LocalDateTime.parse(confirmDay));
         // 모임을 수락한 참여자 리스트 가져오기
         List<GroupInfo> agreedParticipants =
                 groupInfoRepository.findByGroupAndIsAgreed(group, "Y");
@@ -667,7 +669,7 @@ public class GroupService {
         Group group = groupRepository.findById(groupId).orElseThrow(GroupNotFoundException::new);
         group.confirm();
         group.delete();
-
+        group.updateGroupType(GroupType.GROUP_CANCEL);
         String message = group.getTitle() + " 모임이 호스트에 의해서 취소되었습니다.";
 
         // 모임을 수락한 참여자 리스트 가져오기

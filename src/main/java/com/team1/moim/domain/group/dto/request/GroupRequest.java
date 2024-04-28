@@ -1,6 +1,7 @@
 package com.team1.moim.domain.group.dto.request;
 
 import com.team1.moim.domain.group.entity.Group;
+import com.team1.moim.domain.group.entity.GroupType;
 import com.team1.moim.domain.group.util.DateTimeFormatterUtil;
 import com.team1.moim.domain.member.entity.Member;
 import jakarta.validation.constraints.Min;
@@ -43,7 +44,7 @@ public class GroupRequest {
 
     private MultipartFile filePath;
 
-    public Group toEntity(Member member, List<GroupInfoRequest> requests) {
+    public Group toEntity(Member member, List<GroupInfoRequest> requests, GroupType groupType) {
 
         return Group.builder()
                 .member(member)
@@ -57,6 +58,7 @@ public class GroupRequest {
                 .voteDeadline(DateTimeFormatterUtil.parseDateTime(voteDeadline))
                 .contents(contents)
                 .participants(requests.size())
+                .groupType(groupType)
                 .build();
     }
 }
