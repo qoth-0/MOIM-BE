@@ -326,7 +326,6 @@ public class GroupService {
         int toIndex = Math.min(fromIndex + size, totalItems);
 
         if (fromIndex >= totalItems) {
-//            throw new NoMoreGroupListException();
             return new ArrayList<>(); // 요청된 페이지 번호가 가지고 있는 아이템 수보다 많은 경우 빈 리스트 반환
         } else if (fromIndex < 0) {
             throw new IllegalArgumentException("Page number should be positive.");

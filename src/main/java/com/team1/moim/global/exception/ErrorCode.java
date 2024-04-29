@@ -26,7 +26,6 @@ public enum ErrorCode {
     ALREADY_VOTED(HttpStatus.BAD_REQUEST, "이미 투표하였습니다."),
     GROUP_AND_GROUP_INFO_NOT_MATCH(HttpStatus.BAD_REQUEST, "모임과 모임 정보가 서로 관련이 없습니다."),
     HOST_INCLUDED(HttpStatus.BAD_REQUEST, "호스트는 모임 참여자에 추가할 수 없습니다."),
-    GROUP_LIST_NOT_FOUND(HttpStatus.NOT_FOUND, "모임리스트가 더이상 없습니다."),
 
     // Member
     EMAIL_DUPLICATION(HttpStatus.BAD_REQUEST, "이미 존재하는 이메일입니다."),
