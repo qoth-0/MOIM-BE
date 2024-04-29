@@ -7,7 +7,9 @@ import com.team1.moim.domain.event.dto.request.RepeatRequest;
 import com.team1.moim.domain.event.dto.request.ToDoListRequest;
 import com.team1.moim.domain.event.dto.response.AlarmResponse;
 import com.team1.moim.domain.event.dto.response.EventResponse;
+import com.team1.moim.domain.event.dto.response.TodoResponse;
 import com.team1.moim.domain.event.entity.Matrix;
+import com.team1.moim.domain.event.entity.ToDoList;
 import com.team1.moim.domain.event.service.EventService;
 import com.team1.moim.domain.event.service.PublicHoliyDayAPI;
 import com.team1.moim.global.dto.ApiSuccessResponse;
@@ -22,15 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
@@ -266,5 +260,33 @@ public class EventController {
                         HttpStatus.OK,
                         httpServletRequest.getServletPath(),
                         eventService.findAlarmByEventId(eventId)));
+    }
+
+    // todolist 조회
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @GetMapping("/{event_id}/todolist")
+    public ResponseEntity<ApiSuccessResponse<List<TodoResponse>>> getTodo(
+            HttpServletRequest httpServletRequest, @PathVariable("event_id") Long eventId) {
+        log.info("할일 조회 시작");
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiSuccessResponse.of(
+                        HttpStatus.OK,
+                        httpServletRequest.getServletPath(),
+                        eventService.getTodo(eventId)));
+    }
+
+    // todolist isChecked 변경
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @PostMapping("/todolist/{todo_id}")
+    public ResponseEntity<ApiSuccessResponse<TodoResponse>> updateIsChecked(
+            HttpServletRequest httpServletRequest, @PathVariable("todo_id") Long todoId, @RequestParam("isChecked") String isChecked) {
+        log.info("할일 체크 변경 시작");
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiSuccessResponse.of(
+                        HttpStatus.OK,
+                        httpServletRequest.getServletPath(),
+                        eventService.updateIsChecked(todoId, isChecked)));
     }
 }

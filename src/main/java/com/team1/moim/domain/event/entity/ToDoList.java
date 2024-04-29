@@ -43,8 +43,7 @@ public class ToDoList extends BaseTimeEntity {
     }
 
     // 투두리스트 수정
-    public void update(String contents, String isChecked) {
-        this.contents = contents;
+    public void updateisChecked(String isChecked) {
         this.isChecked = isChecked;
     }
 
