@@ -25,9 +25,12 @@ public class Room extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // 호스트 정보
+
+
     // 채팅방의 이름
     @Column(nullable = false)
-    private String name;
+    private String title;
 
     // 채팅방 삭제일
     // 현재 날짜를 기준으로 최소한 30분은 지속되어야 한다.
@@ -35,31 +38,19 @@ public class Room extends BaseTimeEntity {
     @CreationTimestamp
     private LocalDateTime deleteDate;
 
-    // 채팅방 인원 수
-    // 나를 포함 최소 2명이 있어야 채팅이 가능
-    @Column(nullable = false)
-    private int numberOfMembers = 2;
-
     // 참여자 목록
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberRoom> memberRoomList = new ArrayList<>();
-
-    // 채팅방 비밀번호
-    private String password;
 
     @Column(nullable = false)
     private String deleteYn = "N";
 
     @Builder
-    public Room(String name,
+    public Room(String title,
                 LocalDateTime deleteDate,
-                int numberOfMembers,
-                String password,
                 String deleteYn) {
-        this.name = name;
+        this.title = title;
         this.deleteDate = deleteDate;
-        this.numberOfMembers = numberOfMembers;
-        this.password = password;
         this.deleteYn = deleteYn;
     }
 }

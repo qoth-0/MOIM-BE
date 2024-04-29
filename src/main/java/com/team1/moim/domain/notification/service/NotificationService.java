@@ -33,7 +33,7 @@ public class NotificationService {
 //        Member member = memberRepository.findById(memberId).orElseThrow(MemberNotFoundException::new);
 //        log.info(member.getNickname() + "회원");
 //        String key = member.getEmail();
-//        String loginEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+//        String loginEmail = SecurityContextHolder.getContext().getAuthentication().getTitle();
 //        if(!key.equals(loginEmail)) throw new MemberNotMatchException();
 //        List<NotificationResponseNew> alarms= redisService.getList(key);
 //        alarms.stream()

@@ -40,6 +40,10 @@ public enum ErrorCode {
     EVENT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 일정입니다."),
     ALARM_NOT_FOUND(HttpStatus.NOT_FOUND, "설정한 알림이 없습니다."),
 
+    // Chat
+    NO_CHAT_PARTICIPANT(HttpStatus.BAD_REQUEST, "채팅 상대를 1명 이상 등록해야 합니다."),
+    HOST_CHAT_INCLUDED(HttpStatus.BAD_REQUEST, "호스트는 채팅 참여자에 추가할 수 없습니다."),
+
     // Notificaion
     NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 알림입니다.");
 
