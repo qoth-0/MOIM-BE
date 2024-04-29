@@ -108,7 +108,7 @@ public class GroupController {
     @GetMapping("/groups/{pageNum}")
     public ResponseEntity<ApiSuccessResponse<List<ListGroupResponse>>> findAllGroups(
             HttpServletRequest httpServletRequest,
-            @PathVariable("pageNum") int pageNum) {
+            @PathVariable("pageNum") int pageNum) throws Exception {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
