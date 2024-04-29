@@ -276,7 +276,7 @@ public class EventController {
                         eventService.getTodo(eventId)));
     }
 
-    // todolist 조회
+    // todolist isChecked 변경
     @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping("/todolist/{todo_id}")
     public ResponseEntity<ApiSuccessResponse<TodoResponse>> updateIsChecked(
