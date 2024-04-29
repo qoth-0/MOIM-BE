@@ -39,6 +39,7 @@ public enum ErrorCode {
     // Event
     EVENT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 일정입니다."),
     ALARM_NOT_FOUND(HttpStatus.NOT_FOUND, "설정한 알림이 없습니다."),
+    TODO_NOT_FOUND(HttpStatus.NOT_FOUND, "작성된 할일이 없습니다."),
 
     // Notificaion
     NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 알림입니다.");
