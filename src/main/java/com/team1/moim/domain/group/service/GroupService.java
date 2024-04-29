@@ -156,6 +156,7 @@ public class GroupService {
                     // Group 확정 및 삭제 처리
                     group.confirm();
                     group.delete();
+                    group.updateGroupType(GroupType.GROUP_CANCEL);
 
                     groupRepository.save(group);
 
@@ -185,6 +186,7 @@ public class GroupService {
                         // Group 확정 및 삭제 처리
                         group.confirm();
                         group.delete();
+                        group.updateGroupType(GroupType.GROUP_CANCEL);
 
                         groupRepository.save(group);
 
@@ -205,6 +207,7 @@ public class GroupService {
                         group.confirm();
                         group.setConfirmedDateTime(recommendEvents.get(0));
                         groupRepository.save(group);
+                        group.updateGroupType(GroupType.GROUP_CONFIRM);
 
                         // 호스트도 알림 발송
                         sseService.sendGroupNotification(group.getMember().getEmail(),
@@ -217,7 +220,7 @@ public class GroupService {
                         // 추천 일정이 여러개라면 모임 확정 알림을 호스트 에게만 전송
                     } else {
                         message = groupTitle + " 모임을 확정해주세요.";
-
+                        group.updateGroupType(GroupType.GROUP_CHOICE);
                         // 호스트한테만 알림 발송
                         sseService.sendGroupNotification(group.getMember().getEmail(),
                                 GroupNotification.from(group, message, NotificationType.GROUP_CHOICE, LocalDateTime.now()));
