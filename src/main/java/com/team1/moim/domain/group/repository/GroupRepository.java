@@ -19,8 +19,8 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
             @Param("isDeleted") String isDeleted,
             @Param("id") Long id);
 
-    Page<Group> findAll(Specification<Group> spec, Pageable pageable);
-
+    @Query("SELECT g FROM Group g JOIN g.groupInfos gi WHERE gi.member = :memberId")
+    Page<Group> findAllByMemberId(@Param("memberId") Long memberId, Pageable pageable);
     List<Group> findByIsConfirmed(String isConfirmed);
     List<Group> findByIsConfirmedAndIsDeleted(String isConfirmed, String isDeleted);
 

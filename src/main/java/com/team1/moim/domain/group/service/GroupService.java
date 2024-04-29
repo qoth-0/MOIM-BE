@@ -31,6 +31,7 @@ import java.util.*;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -286,7 +287,9 @@ public class GroupService {
 
     // 전체 모임 조회하기
     @Transactional
-    public List<ListGroupResponse> findGroups(Pageable pageable) {
+    public List<ListGroupResponse> findGroups(int pageNum) {
+//       1페이지당 나오는 갯수
+        int size = 6;
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
 
@@ -299,6 +302,7 @@ public class GroupService {
         // 자기가 속한 모든 그룹 = groups
 
         List<ListGroupResponse> groupResponse = new ArrayList<>();
+
 
         for(Group group: groups){ // 자기가 속한 모든 그룹의 정보를 추출
             List<String[]> guestEmailNicknameIsAgreed = new ArrayList<>(); // 각 그룹의 게스트 이메일, 닉네임, 동의여부
@@ -313,8 +317,27 @@ public class GroupService {
             }
             groupResponse.add(ListGroupResponse.from(group, guestEmailNicknameIsAgreed));
         }
+        // 정렬 (Group ID에 따라 내림차순)
+        Collections.sort(groupResponse, (a, b) -> b.getId().compareTo(a.getId()));
 
-        return groupResponse;
+        // 페이징 처리
+        int totalItems = groupResponse.size();
+        int fromIndex = (pageNum - 1) * size;
+        int toIndex = Math.min(fromIndex + size, totalItems);
+
+        if (fromIndex >= totalItems) {
+            return new ArrayList<>(); // 요청된 페이지 번호가 가지고 있는 아이템 수보다 많은 경우 빈 리스트 반환
+        } else if (fromIndex < 0) {
+            throw new IllegalArgumentException("Page number should be positive.");
+        }
+
+        return new ArrayList<>(groupResponse.subList(fromIndex, toIndex));
+
+//        return groupResponse;
+//        Page<Group> groups = groupRepository.findAllByMemberId(member.getId(), pageable);
+
+        // Page를 List로 변환
+//        return groups.map(this::convertToListGroupResponse).getContent();
     }
 
     @Transactional
@@ -342,8 +365,15 @@ public class GroupService {
             List<LocalDateTime> recommendEvents = recommendGroupSchedule(savedGroupInfo.getGroup());
             log.info("추천 일정: " + recommendEvents);
             recommendEvents.forEach(recommendEvent -> {
+
                 try {
-                    redisService.setAvailableList(groupId.toString(), recommendEvent);
+                    List<AvailableResponse> existingEvents = redisService.getAvailableList(groupId.toString());
+
+                    // 추천된 이벤트가 리스트에 이미 있는지 확인합니다
+                    if (!existingEvents.contains(recommendEvent)) {
+                        // 이벤트가 없을 경우 Redis에 추가합니다
+                        redisService.setAvailableList(groupId.toString(), recommendEvent);
+                    }
                 } catch (Exception  e) {
                     throw new RuntimeException(e);
                 }
