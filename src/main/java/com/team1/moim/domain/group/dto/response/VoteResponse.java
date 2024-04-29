@@ -8,7 +8,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class VoteResponse {
-    private Long groupInfoId; // 모임 정보 id
+    private Long groupInfoId; // 모임 정보 chatId
     private String participantName; // 참여자 닉네임
     private String isAgree; // 찬성 또는 반대
 
