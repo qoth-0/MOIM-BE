@@ -7,6 +7,7 @@ import com.team1.moim.domain.event.dto.request.RepeatRequest;
 import com.team1.moim.domain.event.dto.request.ToDoListRequest;
 import com.team1.moim.domain.event.dto.response.AlarmResponse;
 import com.team1.moim.domain.event.dto.response.EventResponse;
+import com.team1.moim.domain.event.dto.response.TodoResponse;
 import com.team1.moim.domain.event.entity.Alarm;
 import com.team1.moim.domain.event.entity.AlarmType;
 import com.team1.moim.domain.event.entity.Event;
@@ -15,9 +16,11 @@ import com.team1.moim.domain.event.entity.Repeat;
 import com.team1.moim.domain.event.entity.RepeatType;
 import com.team1.moim.domain.event.entity.ToDoList;
 import com.team1.moim.domain.event.exception.EventNotFoundException;
+import com.team1.moim.domain.event.exception.TodoNotFoundException;
 import com.team1.moim.domain.event.repository.AlarmRepository;
 import com.team1.moim.domain.event.repository.EventRepository;
 import com.team1.moim.domain.event.repository.RepeatRepository;
+import com.team1.moim.domain.event.repository.ToDoListRepository;
 import com.team1.moim.domain.member.entity.Member;
 import com.team1.moim.domain.member.exception.MemberNotFoundException;
 import com.team1.moim.domain.member.exception.MemberNotMatchException;
@@ -56,6 +59,7 @@ public class EventService {
     private final MemberRepository memberRepository;
     private final RepeatRepository repeatRepository;
     private final AlarmRepository alarmRepository;
+    private final ToDoListRepository toDoListRepository;
     private final S3Service s3Service;
     private final SseService sseService;
 //    private final RedisService redisService;
@@ -503,5 +507,20 @@ public class EventService {
             alarmResponses.add(alarmResponse);
         }
         return alarmResponses;
+    }
+
+    public List<TodoResponse> getTodo(Long eventId) {
+        List<ToDoList> toDoLists = toDoListRepository.findByEventId(eventId);
+        List<TodoResponse> todoResponses = new ArrayList<>();
+        for(ToDoList toDoList : toDoLists) {
+            todoResponses.add(TodoResponse.from(toDoList));
+        }
+        return todoResponses;
+    }
+
+    public TodoResponse updateIsChecked(Long todoId, String isChecked) {
+        ToDoList toDoList = toDoListRepository.findById(todoId).orElseThrow(TodoNotFoundException::new);
+        toDoList.updateisChecked(isChecked);
+        return TodoResponse.from(toDoListRepository.save(toDoList));
     }
 }
