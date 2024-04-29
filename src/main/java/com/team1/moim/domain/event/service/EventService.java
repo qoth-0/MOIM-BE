@@ -124,7 +124,7 @@ public class EventService {
 
         // 일정에 반복 일정 추가, 다음 반복 일정 생성하는 메소드 호출
         if (repeatRequest != null) {
-            //부모 일정도 repeat_parent에 id 추가
+            //부모 일정도 repeat_parent에 chatId 추가
             newEvent.setRepeatParent(newEvent.getId());
 
             RepeatType repeatType = switch (repeatRequest.getRepeatType()) {

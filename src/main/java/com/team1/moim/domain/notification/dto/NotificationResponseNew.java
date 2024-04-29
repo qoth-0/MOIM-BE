@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Getter
 public class NotificationResponseNew {
     private NotificationType notificationType;
-    // event 또는 gruop의 id
+    // event 또는 gruop의 chatId
     private Long id;
     private String nickname;
     private String message;
