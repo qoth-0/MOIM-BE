@@ -2,6 +2,7 @@ package com.team1.moim.domain.chat.repository;
 
 import com.team1.moim.domain.chat.entity.MemberRoom;
 import com.team1.moim.domain.chat.entity.Room;
+import com.team1.moim.domain.member.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,4 +19,8 @@ public interface MemberRoomRepository extends JpaRepository<MemberRoom, Long> {
 //    MemberRoom findHostByRoomId(@Param("roomId") Long roomId);
 
     List<MemberRoom> findByRoom(Room room);
+
+    List<MemberRoom> findByMember(Member member);
+
+
 }

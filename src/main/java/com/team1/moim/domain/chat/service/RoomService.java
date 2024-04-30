@@ -4,23 +4,18 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.team1.moim.domain.chat.dto.request.MemberRoomRequest;
 import com.team1.moim.domain.chat.dto.request.RoomRequest;
 import com.team1.moim.domain.chat.dto.response.RoomDetailResponse;
+import com.team1.moim.domain.chat.dto.response.RoomListResponse;
 import com.team1.moim.domain.chat.entity.MemberRoom;
 import com.team1.moim.domain.chat.entity.Room;
 import com.team1.moim.domain.chat.exception.IsBeforeNowException;
 import com.team1.moim.domain.chat.repository.MemberRoomRepository;
 import com.team1.moim.domain.chat.repository.RoomRepository;
-import com.team1.moim.domain.group.dto.request.GroupInfoRequest;
-import com.team1.moim.domain.group.dto.response.GroupDetailResponse;
-import com.team1.moim.domain.group.entity.Group;
-import com.team1.moim.domain.group.entity.GroupInfo;
-import com.team1.moim.domain.group.entity.GroupType;
 import com.team1.moim.domain.group.exception.HostIncludedException;
 import com.team1.moim.domain.group.exception.ParticipantRequiredException;
 import com.team1.moim.domain.member.entity.Member;
 import com.team1.moim.domain.member.exception.MemberNotFoundException;
 import com.team1.moim.domain.member.repository.MemberRepository;
 import com.team1.moim.domain.notification.NotificationType;
-import com.team1.moim.domain.notification.dto.GroupNotification;
 import com.team1.moim.domain.notification.dto.RoomNotification;
 import com.team1.moim.global.config.sse.service.SseService;
 import jakarta.transaction.Transactional;
@@ -30,6 +25,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -97,5 +94,51 @@ public class RoomService {
 
         return RoomDetailResponse.from(room);
 
+    }
+
+    public List<RoomListResponse> findAllRoom(int pageNum) {
+        // 1페이지당 나오는 갯수
+        int size = 6;
+        Member member = findMemberByEmail();
+        List<Room> rooms = new ArrayList<>();
+        List<MemberRoom> memberRooms = new ArrayList<>();
+        memberRooms = memberRoomRepository.findByMember(member); // 자기가 게스트인 그룹의 인포
+        rooms = roomRepository.findByMember(member); // 자기가 호스트인 그룹
+
+        for (MemberRoom memberRoom : memberRooms) {
+            rooms.add(memberRoom.getRoom());
+        }
+        // 자기가 속한 모든 채팅방 = rooms
+        List<RoomListResponse> roomListResponses = new ArrayList<>();
+
+        //RoomListResponse 로 변환
+        for (Room room : rooms) {
+            List<MemberRoom> memberRoom = memberRoomRepository.findByRoom(room);
+            List<String[]> tempMemeberRoom = new ArrayList<>();
+            for (MemberRoom memberRoom1 : memberRoom) {
+                tempMemeberRoom.add(new String[]{memberRoom1.getMember().getEmail(),
+                        memberRoom1.getMember().getNickname(),
+                        String.valueOf(memberRoom1.getLeaveDate()),
+                        String.valueOf(memberRoom1.getId())});
+
+            }
+
+            roomListResponses.add(RoomListResponse.from(room, tempMemeberRoom));
+        }
+        // 정렬 id에 따라 내림 차순
+        Collections.sort(roomListResponses, (a, b) -> b.getId().compareTo(a.getId()));
+
+        // 페이징 처리
+        int totalItems = roomListResponses.size();
+        int fromIndex = (pageNum - 1) * size;
+        int toIndex = Math.min(fromIndex + size, totalItems);
+
+        if (fromIndex >= totalItems) {
+            return new ArrayList<>(); // 요청된 페이지 번호가 가지고 있는 아이템 수보다 많은 경우 빈 리스트 반환
+        } else if (fromIndex < 0) {
+            throw new IllegalArgumentException("Page number should be positive.");
+        }
+
+        return new ArrayList<>(roomListResponses.subList(fromIndex, toIndex));
     }
 }
