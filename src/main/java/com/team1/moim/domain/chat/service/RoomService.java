@@ -84,7 +84,7 @@ public class RoomService {
         // 채팅방 생성 완료와 동시에 참여자들에게 알림 전송
         String hostname = host.getNickname();
         String roomTitle = room.getTitle();
-        String message = String.format("%s님이 \"%s\" 모임에 초대했습니다. 참여하시겠습니까?", hostname, roomTitle);
+        String message = String.format("%s님이 \"%s\" 채팅방을 생성했습니다. 참여하시겠습니까?", hostname, roomTitle);
         log.info("메시지 내용 확인: " + message);
 
         List<MemberRoom> roomMembers = memberRoomRepository.findByRoom(room);

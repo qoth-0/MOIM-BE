@@ -104,6 +104,9 @@ public class RedisService {
             if(alarm instanceof GroupNotification) {
                 notificationResponses.add(NotificationResponseNew.fromGroup((GroupNotification) alarm));
             }
+            if(alarm instanceof RoomNotification) {
+                notificationResponses.add(NotificationResponseNew.fromRoom((RoomNotification) alarm));
+            }
 
         }
         return notificationResponses;
