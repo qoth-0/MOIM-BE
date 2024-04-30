@@ -9,28 +9,21 @@ import com.team1.moim.domain.chat.entity.Room;
 import com.team1.moim.domain.chat.exception.IsBeforeNowException;
 import com.team1.moim.domain.chat.repository.MemberRoomRepository;
 import com.team1.moim.domain.chat.repository.RoomRepository;
-import com.team1.moim.domain.group.dto.request.GroupInfoRequest;
-import com.team1.moim.domain.group.dto.response.GroupDetailResponse;
-import com.team1.moim.domain.group.entity.Group;
-import com.team1.moim.domain.group.entity.GroupInfo;
-import com.team1.moim.domain.group.entity.GroupType;
 import com.team1.moim.domain.group.exception.HostIncludedException;
 import com.team1.moim.domain.group.exception.ParticipantRequiredException;
 import com.team1.moim.domain.member.entity.Member;
 import com.team1.moim.domain.member.exception.MemberNotFoundException;
 import com.team1.moim.domain.member.repository.MemberRepository;
 import com.team1.moim.domain.notification.NotificationType;
-import com.team1.moim.domain.notification.dto.GroupNotification;
 import com.team1.moim.domain.notification.dto.RoomNotification;
 import com.team1.moim.global.config.sse.service.SseService;
 import jakarta.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Slf4j
 @Service
