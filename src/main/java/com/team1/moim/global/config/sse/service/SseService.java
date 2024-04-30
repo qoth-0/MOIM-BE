@@ -1,6 +1,7 @@
 package com.team1.moim.global.config.sse.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.team1.moim.domain.notification.dto.RoomNotification;
 import com.team1.moim.global.config.redis.RedisService;
 import com.team1.moim.domain.notification.dto.GroupNotification;
 import com.team1.moim.domain.notification.dto.EventNotification;
@@ -88,6 +89,25 @@ public class SseService {
         } catch (Exception e){
             log.error("알림 전송 중 에러");
             redisService.setGroupList(memberEmail, groupNotification);
+        }
+    }
+
+    public void sendRoomNotification(String memberEmail,
+                                      RoomNotification roomNotification) throws JsonProcessingException {
+        try {
+            SseEmitter emitter = emitterRepository.get(memberEmail);
+            if(emitter != null) {
+                emitter.send(SseEmitter.event()
+                        .name("sendRoomAlarm")
+                        .data(roomNotification));
+            }else {
+                log.error(memberEmail + " SseEmitter가 존재하지 않음");
+            }
+            // redis 저장
+            redisService.setRoomList(memberEmail, roomNotification);
+        } catch (Exception e){
+            log.error("알림 전송 중 에러");
+            redisService.setRoomList(memberEmail, roomNotification);
         }
     }
 }

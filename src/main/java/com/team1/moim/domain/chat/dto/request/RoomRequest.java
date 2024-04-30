@@ -16,10 +16,15 @@ public class RoomRequest {
     private String title;
 
     @NotEmpty(message = "채팅방 삭제 시간을 설정하세요.")
-    private LocalDateTime deleteDate;
+    private String deleteDate;
 
-    public Room toEntity(Member member, List<MemberRoomRequest> requests) {
+    public Room toEntity(Member member, List<MemberRoomRequest> memberRequests) {
+
         return Room.builder()
+                .member(member)
+                .title(title)
+                .deleteDate(LocalDateTime.parse(deleteDate))
+                .participants(memberRequests.size())
                 .build();
     }
 }

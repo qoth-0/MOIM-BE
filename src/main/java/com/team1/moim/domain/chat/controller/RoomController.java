@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,15 +35,14 @@ public class RoomController {
     public ResponseEntity<ApiSuccessResponse<RoomDetailResponse>> createRoom(
             HttpServletRequest httpServletRequest,
             @Valid RoomRequest roomRequest,
-            @RequestPart(value = "memberRoomRequest", required = false) List<MemberRoomRequest> memberRoomRequests) throws JsonProcessingException {
+            @RequestPart(value = "memberRoomRequests", required = false) List<MemberRoomRequest> memberRoomRequests) throws JsonProcessingException {
 
-//        return ResponseEntity
-//                .status(HttpStatus.OK)
-//                .body(ApiSuccessResponse.of(
-//                        HttpStatus.OK,
-//                        httpServletRequest.getServletPath(),
-//                        roomService.create(roomRequest, memberRoomRequests)
-//                ));
-        return null;
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiSuccessResponse.of(
+                        HttpStatus.OK,
+                        httpServletRequest.getServletPath(),
+                        roomService.create(roomRequest, memberRoomRequests)));
     }
+
 }

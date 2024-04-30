@@ -48,6 +48,17 @@ public class NotificationResponseNew {
                 .build();
     }
 
+    public static NotificationResponseNew fromRoom(RoomNotification roomNotification) {
+        return NotificationResponseNew.builder()
+                .id(roomNotification.getRoomId())
+                .nickname(roomNotification.getHostName())
+                .message(roomNotification.getMessage())
+                .sendTime(roomNotification.getSendTime())
+                .notificationType(roomNotification.getNotificationType())
+                .readYn(roomNotification.getReadYn())
+                .build();
+    }
+
     public void read(String readYn) {
         this.readYn = readYn;
     }
