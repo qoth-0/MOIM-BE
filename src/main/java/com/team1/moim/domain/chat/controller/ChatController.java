@@ -39,7 +39,6 @@ public class ChatController {
 //        return chatService.save(chatRoomNo, request);
 //    }
     public ChatResponse broadcasting(ChatRequest request) {
-
         log.info("Chat message received : {}", request);
         return chatService.save(request);
     }

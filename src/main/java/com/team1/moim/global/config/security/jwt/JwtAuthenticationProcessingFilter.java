@@ -4,9 +4,9 @@ import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.team1.moim.domain.member.entity.Member;
 import com.team1.moim.domain.member.exception.MemberNotFoundException;
 import com.team1.moim.domain.member.repository.MemberRepository;
+import com.team1.moim.global.config.security.PasswordUtil;
 import com.team1.moim.global.config.security.jwt.exception.JwtExpiredException;
 import com.team1.moim.global.config.security.jwt.exception.RefreshTokenNotFoundException;
-import com.team1.moim.global.config.security.PasswordUtil;
 import com.team1.moim.global.exception.ErrorCode;
 import com.team1.moim.global.exception.ErrorDetail;
 import jakarta.servlet.FilterChain;
@@ -23,6 +23,7 @@ import org.springframework.security.core.authority.mapping.NullAuthoritiesMapper
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
@@ -48,7 +49,8 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
             "/api/auth/verify",
             "/api/auth/email-validate",
             "/api/auth/nickname-validate",
-            "/api/events/getHoliday"
+            "/api/events/getHoliday",
+            "/ws-endpoint/**"
     };
 
     private final JwtProvider jwtProvider;
@@ -59,21 +61,24 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
     /**
      * NO_CHECK_URLS로 요청이 들어오면, filterChain.doFilter()로 현재 필터 통과
      */
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException, JwtExpiredException {
-        log.info("JWT Filter 진입");
-        log.info("requestURI: " + request.getRequestURI());
-        for (String url : NO_CHECK_URLS) {
-            if (request.getRequestURI().equals(url)) {
-                log.info(url + " 필터 통과");
-                filterChain.doFilter(request, response); // NO_CHECK_URLS로 요청 들어오면 다음 필터 호출
-                return; // 이후 현재 필터 진행 막기 (안해주면 아래로 내려가서 계속 필터 진행 시킴)
+                                    FilterChain filterChain) throws ServletException, IOException {
+        String requestURI = request.getRequestURI();
+        log.info("JWT Filter 진입, requestURI: {}", requestURI);
+
+        // NO_CHECK_URLS와 요청 URI 매칭 검사
+        for (String urlPattern : NO_CHECK_URLS) {
+            if (pathMatcher.match(urlPattern, requestURI)) {
+                log.info("{}에 대한 요청은 필터 통과", requestURI);
+                filterChain.doFilter(request, response);
+                return;
             }
         }
         log.info("NO_CHECK_URL PASS");
-
         try {
             // 요청 헤더에서 RT 추출
             // 요청 헤더에 RT가 있는 경우는, AT가 만료되어 요청한 경우 밖에 없음

@@ -43,6 +43,7 @@ public class SecurityConfig {
             "/connect",
             "api/events",
             "api/events/**",
+            "/ws-endpoint/**"
 //            "api/events/repeat/"
     };
     private static final String[] AUTH_API_URL = {
@@ -52,7 +53,6 @@ public class SecurityConfig {
     private static final String[] MOIM_API_URL = {
             "/api/group",
             "/api/group/**",
-            "/ws/**"
     };
 
     private final LoginService loginService;
