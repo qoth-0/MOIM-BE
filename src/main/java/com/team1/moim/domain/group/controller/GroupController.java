@@ -179,5 +179,21 @@ public class GroupController {
                         groupService.cancel(groupId)));
     }
 
+    // 모임 조회(모든 타입)
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @GetMapping("/{groupId}")
+    public ResponseEntity<ApiSuccessResponse<GroupDetailResponse>> findGroup(
+            HttpServletRequest httpServletRequest,
+            @PathVariable("groupId") Long groupId) {
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiSuccessResponse.of(
+                        HttpStatus.OK,
+                        httpServletRequest.getServletPath(),
+                        groupService.findGroup(groupId)));
+    }
+
+
 
 }

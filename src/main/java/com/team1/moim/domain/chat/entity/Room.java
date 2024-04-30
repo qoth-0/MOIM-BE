@@ -30,6 +30,9 @@ public class Room extends BaseTimeEntity {
     @Column(nullable = false)
     private String title;
 
+    // 채팅방 메모
+    private String memo;
+
     // 채팅방 삭제일
     // 현재 날짜를 기준으로 최소한 30분은 지속되어야 한다.
     @Column(nullable = false)
@@ -46,9 +49,10 @@ public class Room extends BaseTimeEntity {
     private String deleteYn = "N";
 
     @Builder
-    public Room(Member member, String title, LocalDateTime deleteDate, int participants) {
+    public Room(Member member, String title, String memo, LocalDateTime deleteDate, int participants) {
         this.member = member;
         this.title = title;
+        this.memo = memo;
         this.deleteDate = deleteDate;
         this.participants = participants;
     }
