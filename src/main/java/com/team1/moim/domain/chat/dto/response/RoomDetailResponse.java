@@ -13,6 +13,7 @@ import lombok.Getter;
 public class RoomDetailResponse {
     private Long id;
     private String title; // 채팅룸 이름
+    private String memo;
     private LocalDateTime deleteDateTime; // 채팅룸 삭제 시간
     private String hostEmail; // 호스트 정보
     private int participants; // 참여자 수
@@ -22,6 +23,7 @@ public class RoomDetailResponse {
                 .id(room.getId())
                 .hostEmail(room.getMember().getEmail())
                 .title(room.getTitle())
+                .memo(room.getMemo())
                 .deleteDateTime(room.getDeleteDate())
                 .participants(room.getParticipants())
                 .build();
