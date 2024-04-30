@@ -52,6 +52,7 @@ public class SecurityConfig {
     private static final String[] MOIM_API_URL = {
             "/api/group",
             "/api/group/**",
+            "/ws/**"
     };
 
     private final LoginService loginService;
