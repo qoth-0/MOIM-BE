@@ -44,9 +44,9 @@ public class MemberRoom extends BaseTimeEntity {
     private boolean isFirstEnter = true;
 
     // 멤버가 호스트인지 알려주는 정보
-    @Builder.Default
-    @Column(nullable = false)
-    private boolean isHost = false;
+//    @Builder.Default
+//    @Column(nullable = false)
+//    private boolean isHost = false;
 
     // 멤버가 채팅방을 떠난 시각
     private LocalDateTime leaveDate;

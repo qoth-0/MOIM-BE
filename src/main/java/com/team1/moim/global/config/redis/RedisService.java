@@ -6,6 +6,7 @@ import com.team1.moim.domain.event.dto.response.AvailableResponse;
 import com.team1.moim.domain.notification.dto.GroupNotification;
 import com.team1.moim.domain.notification.dto.EventNotification;
 import com.team1.moim.domain.notification.dto.NotificationResponseNew;
+import com.team1.moim.domain.notification.dto.RoomNotification;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -65,6 +66,13 @@ public class RedisService {
         log.info("모임 알림 저장");
         alarms.leftPush(key, groupNotification);
         log.info("모임 알림 저장 성공");
+    }
+
+    public void setRoomList(String key, RoomNotification roomNotification) throws JsonProcessingException {
+        ListOperations<String, Object> alarms = redisTemplate1.opsForList();
+        log.info("채팅방 생성 알림 저장");
+        alarms.leftPush(key, roomNotification);
+        log.info("채팅방 생성 알림 저장 성공");
     }
 
     public void setAvailableList(String key, LocalDateTime availableDay) throws JsonProcessingException {
