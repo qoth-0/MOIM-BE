@@ -716,4 +716,9 @@ public class GroupService {
         }
         return FindConfirmedGroupResponse.from(groupRepository.save(group));
     }
+
+    public GroupDetailResponse findGroup(Long groupId) {
+        Group group = groupRepository.findById(groupId).orElseThrow(GroupNotFoundException::new);
+        return GroupDetailResponse.from(group);
+    }
 }

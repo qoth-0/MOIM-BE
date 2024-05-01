@@ -15,6 +15,8 @@ public class RoomRequest {
     @NotEmpty(message = "채팅방 이름을 설정하세요.")
     private String title;
 
+    private String memo;
+
     @NotEmpty(message = "채팅방 삭제 시간을 설정하세요.")
     private String deleteDate;
 
@@ -23,6 +25,7 @@ public class RoomRequest {
         return Room.builder()
                 .member(member)
                 .title(title)
+                .memo(memo)
                 .deleteDate(LocalDateTime.parse(deleteDate))
                 .participants(memberRequests.size())
                 .build();
