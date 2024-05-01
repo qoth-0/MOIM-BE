@@ -13,6 +13,7 @@ public record ChatResponse(
         String content,
         String email,
         String nickname,
+        String profileImage,
         MessageType type,
         LocalDateTime createdAt
 ) {
@@ -24,6 +25,7 @@ public record ChatResponse(
                 .content(chat.getContent())
                 .email(chat.getMember().getEmail())
                 .nickname(chat.getMember().getNickname())
+                .profileImage(chat.getMember().getProfileImage())
                 .type(chat.getType())
                 .createdAt(chat.getCreatedAt())
                 .build();
