@@ -27,6 +27,13 @@ public class AuthController {
         this.authService = authService;
     }
 
+
+    // 상태검사
+    @GetMapping
+    public String HealthCheck() {
+        return "ok";
+    }
+
     @PostMapping("/sign-up")
     public ResponseEntity<ApiSuccessResponse<MemberResponse>> signUp(HttpServletRequest request,
                                                                      @Valid SignUpRequest signUpRequest){
