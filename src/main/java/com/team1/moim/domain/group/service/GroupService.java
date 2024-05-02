@@ -170,13 +170,15 @@ public class GroupService {
                     // 모임 일정 자동 추천 로직 실행 후 추천 일정 리스트 가져오기
                     List<LocalDateTime> recommendEvents = recommendGroupSchedule(group);
                     log.info("추천 일정: " + recommendEvents);
-                    recommendEvents.forEach(recommendEvent -> {
-                        try {
-                            redisService.setAvailableList(group.getId().toString(), recommendEvent);
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
+                    if (redisService.getAvailableList(String.valueOf(group.getId())).isEmpty()) {
+                        recommendEvents.forEach(recommendEvent -> {
+                            try {
+                                redisService.setAvailableList(group.getId().toString(), recommendEvent);
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                        });
+                    }
                     log.info("추천일정 redis 저장완료");
 
                     // 모일 수 있는 시간이 없다면, 모두에게 모일 수 없다는 알림 발송
@@ -367,20 +369,22 @@ public class GroupService {
             // 모임 일정 자동 추천 로직 실행 후 추천 일정 리스트 가져오기
             List<LocalDateTime> recommendEvents = recommendGroupSchedule(savedGroupInfo.getGroup());
             log.info("추천 일정: " + recommendEvents);
-            recommendEvents.forEach(recommendEvent -> {
+            if (redisService.getAvailableList(groupId.toString()).isEmpty()) {
+                recommendEvents.forEach(recommendEvent -> {
 
-                try {
-                    List<AvailableResponse> existingEvents = redisService.getAvailableList(groupId.toString());
+                    try {
+                        List<AvailableResponse> existingEvents = redisService.getAvailableList(groupId.toString());
 
-                    // 추천된 이벤트가 리스트에 이미 있는지 확인합니다
-                    if (!existingEvents.contains(recommendEvent)) {
-                        // 이벤트가 없을 경우 Redis에 추가합니다
-                        redisService.setAvailableList(groupId.toString(), recommendEvent);
+                        // 추천된 이벤트가 리스트에 이미 있는지 확인합니다
+                        if (!existingEvents.contains(recommendEvent)) {
+                            // 이벤트가 없을 경우 Redis에 추가합니다
+                            redisService.setAvailableList(groupId.toString(), recommendEvent);
+                        }
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
                     }
-                } catch (Exception  e) {
-                    throw new RuntimeException(e);
-                }
-            });
+                });
+            }
             log.info("추천일정 redis 저장완료");
 
 
