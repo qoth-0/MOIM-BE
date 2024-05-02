@@ -9,19 +9,25 @@ import lombok.Builder;
 public record ChatResponse(
         Long chatId,
         Long userId,
-        String username,
+        Long roomId,
+        String content,
+        String email,
+        String nickname,
+        String profileImage,
         MessageType type,
-        LocalDateTime createdAt,
-        String content
+        LocalDateTime createdAt
 ) {
     public static ChatResponse from(Chat chat) {
         return ChatResponse.builder()
                 .chatId(chat.getId())
                 .userId(chat.getMember().getId())
-                .username(chat.getMember().getNickname())
+                .roomId(chat.getRoom().getId())
+                .content(chat.getContent())
+                .email(chat.getMember().getEmail())
+                .nickname(chat.getMember().getNickname())
+                .profileImage(chat.getMember().getProfileImage())
                 .type(chat.getType())
                 .createdAt(chat.getCreatedAt())
-                .content(chat.getContent())
                 .build();
     }
 }

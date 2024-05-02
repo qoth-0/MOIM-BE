@@ -45,6 +45,7 @@ public enum ErrorCode {
     NO_CHAT_PARTICIPANT(HttpStatus.BAD_REQUEST, "채팅 상대를 1명 이상 등록해야 합니다."),
     HOST_CHAT_INCLUDED(HttpStatus.BAD_REQUEST, "호스트는 채팅 참여자에 추가할 수 없습니다."),
     IS_BEFORE_NOW(HttpStatus.BAD_REQUEST, "삭제시간이 현재보다 과거입니다."),
+    ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 채팅룸입니다."),
 
     // Notificaion
     NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 알림입니다.");

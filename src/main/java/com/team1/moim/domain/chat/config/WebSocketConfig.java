@@ -44,7 +44,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         // 즉, registerStompEndpoints 메서드는 연결할 소켓 엔드포인트를 등록하는 메서드
         registry.setErrorHandler(stompExceptionHandler)
                 .addEndpoint("/ws-endpoint")
-                .addInterceptors()
+//                .addInterceptors()
                 .setAllowedOriginPatterns("*")
                 // 클라이언트가 sockJS로 개발되었을 때만 필요하다(필요 없으면 추후 제거)
                 .withSockJS();

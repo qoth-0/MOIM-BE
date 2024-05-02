@@ -200,7 +200,8 @@ public class JwtProvider {
     public void validateWebSocketToken(String token) {
         log.info("validateWebSocketToken() 진입! 웹소켓 연결 시 헤더의 토큰 유효성 검증 시작!");
         try {
-            JWT.require(Algorithm.HMAC512(secretKey)).build().verify(token);
+            // BEARER 뒤의 실제 토큰 데이터만 남긴다.
+            JWT.require(Algorithm.HMAC512(secretKey)).build().verify(token.replace(BEARER, ""));
         } catch (TokenExpiredException e) {
             throw UnauthorizedException.of(e.getClass().getName(), "만료된 JWT 토큰입니다.");
         } catch (SignatureVerificationException e) {
