@@ -3,7 +3,7 @@ name: deploy k8s-moim
 on:
   push:
     branches:
-    - main
+    - qoth/depl
   # pull_request:
   #   branches:
   #   - sy
