@@ -58,15 +58,20 @@ public class SseService {
     public void sendEventAlarm(String email, EventNotification eventNotification) throws JsonProcessingException {
         try {
             SseEmitter emitter = emitterRepository.get(email);
+            log.info("emitter : " + emitter);
             if(emitter != null) {
+                log.info("sse 알림 전송 전");
                 emitter.send(SseEmitter.event()
                         .name("sendEventAlarm")
                         .data(eventNotification));
+                log.info("sse 알림 전송 후");
             }else {
                 log.error(email + " SseEmitter가 존재하지 않음");
             }
             // redis 저장
+            log.info("redis 저장 시작");
             redisService.setEventList(email, eventNotification);
+            log.info("reids 저장 성공");
         } catch (Exception e) {
             log.error("알림 전송 중 에러");
             redisService.setEventList(email, eventNotification);

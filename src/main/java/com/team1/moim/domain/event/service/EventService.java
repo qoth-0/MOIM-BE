@@ -382,6 +382,7 @@ public class EventService {
                 }
                 if (alarm.getAlarmtype() == AlarmType.M) {
                     if (event.getStartDateTime().minusMinutes(alarm.getSetTime()).isBefore(LocalDateTime.now())) {
+                        log.info("스케쥴러 일정 알림 - 분");
                         Member member = alarm.getEvent().getMember();
                         sseService.sendEventAlarm(member.getEmail(),
                                 EventNotification.from(

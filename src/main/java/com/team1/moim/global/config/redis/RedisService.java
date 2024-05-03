@@ -98,6 +98,7 @@ public class RedisService {
         List<Object> alarms = listOperations.range(key, 0, -1);
         List<NotificationResponseNew> notificationResponses = new ArrayList<>();
         for(Object alarm : alarms) {
+            log.info("alarm: " + alarm);
             if(alarm instanceof EventNotification) {
                 notificationResponses.add(NotificationResponseNew.fromEvent((EventNotification) alarm));
             }
