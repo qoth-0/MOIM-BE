@@ -192,6 +192,7 @@ public class JwtProvider {
     public void validateToken(String token){
         log.info("validateToken() 진입! 토큰 유효성 검증 시작!");
         log.info("token : " + token);
+        log.info("secretKey : " + secretKey);
         JWT.require(Algorithm.HMAC512(secretKey)).build().verify(token);
     }
 
