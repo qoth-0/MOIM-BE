@@ -71,7 +71,7 @@ public class EventService {
                                 List<ToDoListRequest> toDoListRequests,
                                 List<AlarmRequest> alarmRequests) throws JsonProcessingException {
         Member member = findMemberByEmail();
-
+        log.info("member : " + member);
         log.info("일정이 추가 됩니다.");
         Matrix matrix;
         if (eventRequest.getMatrix().equals("Q1")) {
