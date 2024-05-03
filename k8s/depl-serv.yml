@@ -48,6 +48,56 @@ spec:
             secretKeyRef: 
               name: moim-db-secret
               key: DB_PASSWORD
+        - name: USERNAME
+          valueFrom:
+            secretKeyRef: 
+              name: email-secret
+              key: USERNAME
+        - name: PASSWORD
+          valueFrom:
+            secretKeyRef: 
+              name: email-secret
+              key: PASSWORD
+        - name: KAKAO_ID
+          valueFrom:
+            secretKeyRef: 
+              name: kakao-secret
+              key: KAKAO_ID
+        - name: KAKAO_SECRET
+          valueFrom:
+            secretKeyRef: 
+              name: kakao-secret
+              key: KAKAO_SECRET
+        - name: GOOGLE_ID
+          valueFrom:
+            secretKeyRef: 
+              name: google-secret
+              key: GOOGLE_ID
+        - name: GOOGLE_SECRET
+          valueFrom:
+            secretKeyRef: 
+              name: google-secret
+              key: GOOGLE_SECRET
+        - name: JWT
+          valueFrom:
+            secretKeyRef: 
+              name: jwt-secret
+              key: JWT
+        - name: ACCESS-KEY
+          valueFrom:
+            secretKeyRef: 
+              name: file-secret
+              key: ACCESS-KEY
+        - name: SECRET-KEY
+          valueFrom:
+            secretKeyRef: 
+              name: file-secret
+              key: SECRET-KEY
+        - name: SECRET
+          valueFrom:
+            secretKeyRef: 
+              name: api-secret
+              key: SECRET
         # 컨테이너 상태 확인 
         readinessProbe:
           httpGet:
