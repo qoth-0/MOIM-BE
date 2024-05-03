@@ -384,6 +384,7 @@ public class EventService {
                     }
                 }
                 if (alarm.getAlarmtype() == AlarmType.M) {
+                    System.out.println("현재 시간 DB : " + event.getStartDateTime().minusMinutes(alarm.getSetTime()));
                     System.out.println("현재 시간 : " + LocalDateTime.now());
                     if (event.getStartDateTime().minusMinutes(alarm.getSetTime()).isBefore(LocalDateTime.now())) {
                         log.info("스케쥴러 일정 알림 시작 - 분");
