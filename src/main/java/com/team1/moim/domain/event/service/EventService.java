@@ -33,6 +33,7 @@ import jakarta.transaction.Transactional;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.chrono.ChronoLocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
@@ -385,8 +386,8 @@ public class EventService {
                 }
                 if (alarm.getAlarmtype() == AlarmType.M) {
                     System.out.println("현재 시간 DB : " + event.getStartDateTime().minusMinutes(alarm.getSetTime()));
-                    System.out.println("현재 시간 : " + LocalDateTime.now());
-                    if (event.getStartDateTime().minusMinutes(alarm.getSetTime()).isBefore(LocalDateTime.now())) {
+                    System.out.println("현재 시간 : " + LocalDateTime.now(ZoneId.of("Asia/Seoul")));
+                    if (event.getStartDateTime().minusMinutes(alarm.getSetTime()).isBefore(LocalDateTime.now(ZoneId.of("Asia/Seoul")))) {
                         log.info("스케쥴러 일정 알림 시작 - 분");
                         Member member = alarm.getEvent().getMember();
                         sseService.sendEventAlarm(member.getEmail(),
