@@ -345,13 +345,16 @@ public class EventService {
     @Scheduled(cron = "0 0/1 * * * *") // 매분마다 실행
     @Transactional
     public void eventSchedule() throws JsonProcessingException {
+        log.info("스케쥴러 시작");
         // 삭제되지 않고, 알림 설정한 일정LiST
         List<Event> events = eventRepository.findByDeleteYnAndAlarmYn("N", "Y");
+
         for (Event event : events) {
             // 과거 일정은 알림 X
             if (event.getStartDateTime().isBefore(LocalDateTime.now())) continue;
             // 이미 전송한 알림 X
             List<Alarm> alarms = alarmRepository.findByEventAndSendYn(event, "N");
+            log.info("전송해야할 알림 개수 " + alarms.size());
             for (Alarm alarm : alarms) {
                 if (alarm.getAlarmtype() == AlarmType.D) {
                     // 지나간 알림은 전송 X
@@ -382,7 +385,7 @@ public class EventService {
                 }
                 if (alarm.getAlarmtype() == AlarmType.M) {
                     if (event.getStartDateTime().minusMinutes(alarm.getSetTime()).isBefore(LocalDateTime.now())) {
-                        log.info("스케쥴러 일정 알림 - 분");
+                        log.info("스케쥴러 일정 알림 시작 - 분");
                         Member member = alarm.getEvent().getMember();
                         sseService.sendEventAlarm(member.getEmail(),
                                 EventNotification.from(
@@ -391,6 +394,7 @@ public class EventService {
                                         member,
                                         LocalDateTime.now(),
                                         NotificationType.EVENT));
+                        log.info("sse 전송 후 ");
                         alarm.sendCheck("Y");
                     }
                 }
