@@ -352,14 +352,14 @@ public class EventService {
 
         for (Event event : events) {
             // 과거 일정은 알림 X
-            if (event.getStartDateTime().isBefore(LocalDateTime.now())) continue;
+            if (event.getStartDateTime().isBefore(LocalDateTime.now(ZoneId.of("Asia/Seoul")))) continue;
             // 이미 전송한 알림 X
             List<Alarm> alarms = alarmRepository.findByEventAndSendYn(event, "N");
             log.info("전송해야할 알림 개수 " + alarms.size());
             for (Alarm alarm : alarms) {
                 if (alarm.getAlarmtype() == AlarmType.D) {
                     // 지나간 알림은 전송 X
-                    if (event.getStartDateTime().minusDays(alarm.getSetTime()).isBefore(LocalDateTime.now())) {
+                    if (event.getStartDateTime().minusDays(alarm.getSetTime()).isBefore(LocalDateTime.now(ZoneId.of("Asia/Seoul")))) {
                         Member member = alarm.getEvent().getMember();
                         sseService.sendEventAlarm(member.getEmail(),
                                 EventNotification.from(
@@ -372,7 +372,7 @@ public class EventService {
                     }
                 }
                 if (alarm.getAlarmtype() == AlarmType.H) {
-                    if (event.getStartDateTime().minusHours(alarm.getSetTime()).isBefore(LocalDateTime.now())) {
+                    if (event.getStartDateTime().minusHours(alarm.getSetTime()).isBefore(LocalDateTime.now(ZoneId.of("Asia/Seoul")))) {
                         Member member = alarm.getEvent().getMember();
                         sseService.sendEventAlarm(member.getEmail(),
                                 EventNotification.from(
