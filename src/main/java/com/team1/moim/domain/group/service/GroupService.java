@@ -750,7 +750,7 @@ public class GroupService {
         for(Group group: allTodayGroup){
             todayGroupResponses.add(TodayGroupResponse.from(group));
         }
-
+        Collections.sort(todayGroupResponses, Comparator.comparing(TodayGroupResponse::getConfirmedDateTime));
         return todayGroupResponses;
 
     }

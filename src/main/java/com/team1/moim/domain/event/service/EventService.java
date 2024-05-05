@@ -37,6 +37,7 @@ import java.time.LocalDateTime;
 import java.time.chrono.ChronoLocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -461,6 +462,7 @@ public class EventService {
             TodayEventResponse eventResponse = TodayEventResponse.from(event, eventTodoList);
             todayEventResponses.add(eventResponse);
         }
+        Collections.sort(todayEventResponses, Comparator.comparing(TodayEventResponse::getStartDate));
 
         return todayEventResponses;
     }
