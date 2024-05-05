@@ -7,6 +7,7 @@ import com.team1.moim.domain.event.dto.request.RepeatRequest;
 import com.team1.moim.domain.event.dto.request.ToDoListRequest;
 import com.team1.moim.domain.event.dto.response.AlarmResponse;
 import com.team1.moim.domain.event.dto.response.EventResponse;
+import com.team1.moim.domain.event.dto.response.TodayEventResponse;
 import com.team1.moim.domain.event.dto.response.TodoResponse;
 import com.team1.moim.domain.event.entity.Matrix;
 import com.team1.moim.domain.event.entity.ToDoList;
@@ -208,10 +209,10 @@ public class EventController {
 //    일별 조회
     @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping("/daily/{year}/{month}/{day}")
-    public ResponseEntity<ApiSuccessResponse<List<EventResponse>>> getDaily(HttpServletRequest httpServletRequest,
-                                                                             @PathVariable("year") int year,
-                                                                             @PathVariable("month") int month,
-                                                                             @PathVariable("day") int day) {
+    public ResponseEntity<ApiSuccessResponse<List<TodayEventResponse>>> getDaily(HttpServletRequest httpServletRequest,
+                                                                                 @PathVariable("year") int year,
+                                                                                 @PathVariable("month") int month,
+                                                                                 @PathVariable("day") int day) {
         log.info("일별 조회 시작");
         return ResponseEntity
                 .status(HttpStatus.OK)

@@ -5,11 +5,7 @@ import com.team1.moim.domain.event.dto.response.AvailableResponse;
 import com.team1.moim.domain.group.dto.request.GroupAlarmRequest;
 import com.team1.moim.domain.group.dto.request.GroupInfoRequest;
 import com.team1.moim.domain.group.dto.request.GroupRequest;
-import com.team1.moim.domain.group.dto.response.FindConfirmedGroupResponse;
-import com.team1.moim.domain.group.dto.response.FindPendingGroupResponse;
-import com.team1.moim.domain.group.dto.response.GroupDetailResponse;
-import com.team1.moim.domain.group.dto.response.ListGroupResponse;
-import com.team1.moim.domain.group.dto.response.VoteResponse;
+import com.team1.moim.domain.group.dto.response.*;
 import com.team1.moim.domain.group.service.GroupService;
 import com.team1.moim.global.dto.ApiSuccessResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -194,6 +190,18 @@ public class GroupController {
                         groupService.findGroup(groupId)));
     }
 
-
+    // 모임 조회(모든 타입)
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @GetMapping("/today")
+    public ResponseEntity<ApiSuccessResponse<List<TodayGroupResponse>>> today(
+            HttpServletRequest httpServletRequest) {
+        log.info("오늘의 확정 모임 조회");
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiSuccessResponse.of(
+                        HttpStatus.OK,
+                        httpServletRequest.getServletPath(),
+                        groupService.todayGroup()));
+    }
 
 }
