@@ -7,10 +7,7 @@ import com.team1.moim.domain.event.repository.EventRepository;
 import com.team1.moim.domain.group.dto.request.GroupAlarmRequest;
 import com.team1.moim.domain.group.dto.request.GroupInfoRequest;
 import com.team1.moim.domain.group.dto.request.GroupRequest;
-import com.team1.moim.domain.group.dto.response.FindConfirmedGroupResponse;
-import com.team1.moim.domain.group.dto.response.FindPendingGroupResponse;
-import com.team1.moim.domain.group.dto.response.GroupDetailResponse;
-import com.team1.moim.domain.group.dto.response.ListGroupResponse;
+import com.team1.moim.domain.group.dto.response.*;
 import com.team1.moim.domain.group.entity.*;
 import com.team1.moim.domain.group.exception.*;
 import com.team1.moim.domain.group.repository.GroupAlarmRepository;
@@ -20,7 +17,6 @@ import com.team1.moim.domain.member.entity.Member;
 import com.team1.moim.domain.member.exception.GroupInfoNotFoundException;
 import com.team1.moim.domain.member.exception.MemberNotFoundException;
 import com.team1.moim.domain.member.repository.MemberRepository;
-import com.team1.moim.domain.group.dto.response.VoteResponse;
 import com.team1.moim.domain.notification.NotificationType;
 import com.team1.moim.global.config.redis.RedisService;
 import com.team1.moim.global.config.s3.S3Service;
@@ -536,7 +532,7 @@ public class GroupService {
 
         for (Member member: agreedMembers) {
             // 각각의 일정 리스트를 합침
-            List<Event> memberEvents = eventRepository.findByMember(member);
+            List<Event> memberEvents = eventRepository.findByMemberAndDeleteYn(member, "N");
             for (Event event : memberEvents) {
                 // 개인 일정의 시작과 종료 시간
                 LocalDateTime eventStart = event.getStartDateTime();
@@ -724,5 +720,38 @@ public class GroupService {
     public GroupDetailResponse findGroup(Long groupId) {
         Group group = groupRepository.findById(groupId).orElseThrow(GroupNotFoundException::new);
         return GroupDetailResponse.from(group);
+    }
+
+    // 오늘 날짜의 확정된 모임리스트 // 확정된, 내가 포함된, 오늘의 그룹을 뽑아내보자
+    public List<TodayGroupResponse> todayGroup()  {
+        Member member = findMemberByEmail();
+
+        List<TodayGroupResponse> todayGroupResponses = new ArrayList<>();
+        List<Group> allTodayGroup = new ArrayList<>();
+
+        List<Group> groups =  groupRepository.findByIsConfirmedAndMember("Y",member); // 자기가 호스트인 모임 확정된 모임
+        List<GroupInfo> groupInfos = groupInfoRepository.findByMemberId(member.getId());
+        for (GroupInfo groupInfo : groupInfos){
+            if(groupInfo.getGroup().getConfirmedDateTime() != null){
+                if(groupInfo.getGroup().getConfirmedDateTime().toLocalDate().equals(LocalDate.now())){
+                    allTodayGroup.add(groupInfo.getGroup());
+                }
+            }
+
+        }
+        for(Group group : groups){
+            if(group.getConfirmedDateTime() != null) {
+                if (group.getConfirmedDateTime().toLocalDate().equals(LocalDate.now())) {
+                    allTodayGroup.add(group);
+                }
+            }
+        }
+
+        for(Group group: allTodayGroup){
+            todayGroupResponses.add(TodayGroupResponse.from(group));
+        }
+
+        return todayGroupResponses;
+
     }
 }

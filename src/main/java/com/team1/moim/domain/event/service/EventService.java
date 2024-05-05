@@ -7,6 +7,7 @@ import com.team1.moim.domain.event.dto.request.RepeatRequest;
 import com.team1.moim.domain.event.dto.request.ToDoListRequest;
 import com.team1.moim.domain.event.dto.response.AlarmResponse;
 import com.team1.moim.domain.event.dto.response.EventResponse;
+import com.team1.moim.domain.event.dto.response.TodayEventResponse;
 import com.team1.moim.domain.event.dto.response.TodoResponse;
 import com.team1.moim.domain.event.entity.Alarm;
 import com.team1.moim.domain.event.entity.AlarmType;
@@ -439,19 +440,29 @@ public class EventService {
         return eventResponses;
     }
 
-    public List<EventResponse> getDaily(int year, int month, int day) {
+    public List<TodayEventResponse> getDaily(int year, int month, int day) {
         Member member = findMemberByEmail();
         log.info(member.getNickname() + "님 일정 조회");
         List<Event> events = eventRepository.findByMemberAndYearAndMonthAndDay(member, year, month, day);
         if (events.isEmpty()) throw new EventNotFoundException();
-        List<EventResponse> eventResponses = new ArrayList<>();
+        List<TodayEventResponse> todayEventResponses = new ArrayList<>();
         for (Event event : events) {
             log.info(event.getTitle());
-            EventResponse eventResponse = EventResponse.from(event);
-            eventResponses.add(eventResponse);
+            List<ToDoList> toDoLists = toDoListRepository.findByEventId(event.getId());
+            List<String[]> eventTodoList = new ArrayList<>();
+
+            for(ToDoList toDoList: toDoLists){
+                String[] tempTodoList = new String[3];
+                tempTodoList[0] = String.valueOf(toDoList.getId());
+                tempTodoList[1] = toDoList.getContents();
+                tempTodoList[2] = toDoList.getIsChecked();
+                eventTodoList.add(tempTodoList);
+            }
+            TodayEventResponse eventResponse = TodayEventResponse.from(event, eventTodoList);
+            todayEventResponses.add(eventResponse);
         }
 
-        return eventResponses;
+        return todayEventResponses;
     }
 
     public EventResponse getEvent(Long eventId) {
