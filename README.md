@@ -247,3 +247,8 @@ Amazon Route 53은 도메인 이름 시스템(DNS) 서비스를 제공하여 사
 
 </div>
 </details>
+
+<br>
+
+## 📝 배포 결과 테스트
+[배포 결과 테스트](https://github.com/HanHwa-Team1-Final-Project/MOIM-BE/blob/ed4cdc932dc37c40a316da55eac5cf0bec536c07/docs/%EB%B0%B0%ED%8F%AC%20%EA%B2%B0%EA%B3%BC%20%ED%85%8C%EC%8A%A4%ED%8A%B8.pdf)

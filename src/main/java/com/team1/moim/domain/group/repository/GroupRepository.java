@@ -3,6 +3,8 @@ package com.team1.moim.domain.group.repository;
 import com.team1.moim.domain.group.entity.Group;
 import java.util.List;
 import java.util.Optional;
+
+import com.team1.moim.domain.member.entity.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -26,5 +28,6 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
 
     List<Group> findByMemberId(Long memberId);
 
+    List<Group> findByIsConfirmedAndMember(String isConfirmed, Member member);
 
 }
