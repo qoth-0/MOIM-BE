@@ -313,7 +313,8 @@ public class GroupService {
                 guestEmailNicknameIsAgreed.add(new String[]{groupInfo.getMember().getEmail(),
                                                             groupInfo.getMember().getNickname(),
                                                             groupInfo.getIsAgreed(),
-                                                            String.valueOf(groupInfo.getId())});
+                                                            String.valueOf(groupInfo.getId()),
+                                                            groupInfo.getIsAddEvent()});
 
             }
             groupResponse.add(ListGroupResponse.from(group, guestEmailNicknameIsAgreed));
@@ -756,9 +757,11 @@ public class GroupService {
     }
 
     public String addEvent(Long groupId) {
+        Member member = findMemberByEmail();
         Group group = groupRepository.findById(groupId).orElseThrow(GroupNotFoundException::new);
-        group.addEvent();
-        groupRepository.save(group);
+        GroupInfo groupInfo = groupInfoRepository.findByGroupAndMember(group, member);
+        groupInfo.addEvent();
+        groupInfoRepository.save(groupInfo);
         return "일정 등록 여부 변경";
     }
 }
