@@ -8,8 +8,10 @@ import com.team1.moim.domain.chat.exception.RoomNotFoundException;
 import com.team1.moim.domain.chat.repository.ChatRepository;
 import com.team1.moim.domain.chat.repository.RoomRepository;
 import com.team1.moim.domain.member.entity.Member;
-import com.team1.moim.domain.member.repository.MemberRepository;
 import com.team1.moim.domain.member.exception.MemberNotFoundException;
+import com.team1.moim.domain.member.repository.MemberRepository;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,7 +28,6 @@ public class ChatService {
 
     @Transactional
     public ChatResponse save(ChatRequest chatRequest) {
-
         Member member = memberRepository.findByNickname(chatRequest.sender()).orElseThrow(MemberNotFoundException::new);
         Room room = roomRepository.findById(chatRequest.room()).orElseThrow(RoomNotFoundException::new);
         Chat chat = Chat.builder()
@@ -37,6 +38,14 @@ public class ChatService {
                 .build();
         chatRepository.save(chat);
         return ChatResponse.from(chat);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ChatResponse> getMessages(Long roomId) {
+        List<Chat> chats = chatRepository.findAllByRoomId(roomId);
+        return chats.stream()
+                .map(ChatResponse::from)
+                .collect(Collectors.toList());
     }
 
 }
