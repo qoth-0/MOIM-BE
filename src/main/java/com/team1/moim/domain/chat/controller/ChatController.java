@@ -48,6 +48,7 @@ public class ChatController {
     public ResponseEntity<ApiSuccessResponse<List<ChatResponse>>> getMessages(
             HttpServletRequest servletRequest,
             @PathVariable Long roomId) {
+        log.info("ID {}번 채팅룸 채팅 내역 로딩 시작", roomId);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ApiSuccessResponse.of(
                         HttpStatus.OK,
