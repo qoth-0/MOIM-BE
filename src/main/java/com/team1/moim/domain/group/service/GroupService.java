@@ -754,4 +754,11 @@ public class GroupService {
         return todayGroupResponses;
 
     }
+
+    public String addEvent(Long groupId) {
+        Group group = groupRepository.findById(groupId).orElseThrow(GroupNotFoundException::new);
+        group.addEvent();
+        groupRepository.save(group);
+        return "일정 등록 여부 변경";
+    }
 }

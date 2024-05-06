@@ -24,6 +24,7 @@ public class ListGroupResponse {
     private int participants;
     private String isConfirmed;
     private String isDeleted;
+    private String isAddEvent;
     private String filePath;
     private LocalDate expectStartDate;
     private LocalDate expectEndDate;
@@ -48,6 +49,7 @@ public class ListGroupResponse {
                 .participants(group.getParticipants())
                 .isConfirmed(group.getIsConfirmed())
                 .isDeleted(group.getIsDeleted())
+                .isAddEvent(group.getIsAddEvent())
                 .filePath(group.getFilePath())
                 .expectStartDate(group.getExpectStartDate())
                 .expectEndDate(group.getExpectEndDate())

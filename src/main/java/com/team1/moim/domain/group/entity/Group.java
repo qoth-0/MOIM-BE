@@ -89,6 +89,10 @@ public class Group extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private GroupType groupType = GroupType.valueOf("GROUP_CREATE");
 
+    // 일정 등록 여부
+    @Column(nullable = false)
+    private String isAddEvent = "N";
+
     @Builder
     public Group(Member member, String title, String contents, int runningTime, LocalDate expectStartDate,
                  LocalDate expectEndDate, LocalTime expectStartTime, LocalTime expectEndTime,
@@ -114,6 +118,10 @@ public class Group extends BaseTimeEntity {
 
     public void confirm() {
         this.isConfirmed = "Y";
+    }
+
+    public void addEvent() {
+        this.isAddEvent = "Y";
     }
 
     public void setConfirmedDateTime(LocalDateTime confirmedDateTime){
