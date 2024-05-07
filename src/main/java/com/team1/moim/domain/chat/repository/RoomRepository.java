@@ -9,7 +9,7 @@ import java.util.List;
 
 @Repository
 public interface RoomRepository extends JpaRepository<Room, Long> {
-    List<Room> findByMember (Member member);
+    List<Room> findByMemberAndDeleteYn (Member member, String isDelete);
 
     List<Room> findByDeleteYn(String isDelete);
 }
