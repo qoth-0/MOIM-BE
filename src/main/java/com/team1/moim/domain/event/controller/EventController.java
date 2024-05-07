@@ -135,7 +135,8 @@ public class EventController {
     }
 
     @PostMapping("/getHoliday")
-    public ResponseEntity<ArrayList<HashMap<String, Object>>> holidayInfoApi(String year, String month) {
+    public ResponseEntity<ArrayList<HashMap<String, Object>>> holidayInfoApi(@RequestParam("year") String year,
+                                                                             @RequestParam("month") String month) {
 
         log.info("year = " + year);
         log.info("month = " + month);
