@@ -49,6 +49,11 @@ public class GroupInfo extends BaseTimeEntity {
     @Builder.Default
     private String isDeleted = "N";
 
+    // 일정 등록 여부
+    @Column(nullable = false)
+    @Builder.Default
+    private String isAddEvent = "N";
+
     public void delete() {
         this.isDeleted = "Y";
     }
@@ -56,6 +61,10 @@ public class GroupInfo extends BaseTimeEntity {
     public void attachGroup(Group group){
         this.group = group;
         group.getGroupInfos().add(this);
+    }
+
+    public void addEvent() {
+        this.isAddEvent = "Y";
     }
 
     public void vote(String agree){

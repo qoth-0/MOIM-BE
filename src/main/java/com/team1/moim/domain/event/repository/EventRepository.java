@@ -24,7 +24,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Query("SELECT e FROM Event e WHERE e.member = :member AND FUNCTION('YEAR', e.startDateTime) = :year AND FUNCTION('WEEK', e.startDateTime) = :week")
     List<Event> findByMemberAndYearAndWeek(@Param("member") Member member, @Param("year") int year, @Param("week") int week);
 
-    @Query("SELECT e FROM Event e WHERE e.member = :member AND FUNCTION('YEAR', e.startDateTime) = :year AND FUNCTION('MONTH', e.startDateTime) = :month AND FUNCTION('DAY', e.startDateTime) = :day")
+    @Query("SELECT e FROM Event e WHERE e.member = :member AND e.deleteYn = 'N' AND FUNCTION('YEAR', e.startDateTime) = :year AND FUNCTION('MONTH', e.startDateTime) = :month AND FUNCTION('DAY', e.startDateTime) = :day")
     List<Event> findByMemberAndYearAndMonthAndDay(@Param("member") Member member, @Param("year") int year, @Param("month") int month, @Param("day") int day);
 
     @Query("SELECT e FROM Event e WHERE e.member = :member AND e.deleteYn = 'N' AND (e.title LIKE %:content% OR e.memo LIKE %:content%)")

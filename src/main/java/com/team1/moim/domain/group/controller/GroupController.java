@@ -204,4 +204,19 @@ public class GroupController {
                         groupService.todayGroup()));
     }
 
+    // 일정 등록 여부 변경
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @PostMapping("/{groupId}/addEvent")
+    public ResponseEntity<ApiSuccessResponse<String>> addEvent(HttpServletRequest httpServletRequest,
+                                                                                 @PathVariable("groupId") Long groupId
+    ) throws JsonProcessingException {
+        log.info("일정등록 여부 변경 API 시작");
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiSuccessResponse.of(
+                        HttpStatus.OK,
+                        httpServletRequest.getServletPath(),
+                        groupService.addEvent(groupId)));
+    }
+
 }
