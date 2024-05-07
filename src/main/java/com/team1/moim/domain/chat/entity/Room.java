@@ -56,4 +56,8 @@ public class Room extends BaseTimeEntity {
         this.deleteDate = deleteDate;
         this.participants = participants;
     }
+
+    public void delete() {
+        this.deleteYn = "Y";
+    }
 }

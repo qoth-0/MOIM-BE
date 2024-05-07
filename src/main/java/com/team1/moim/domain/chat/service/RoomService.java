@@ -22,9 +22,11 @@ import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.time.ZoneId;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -80,7 +82,7 @@ public class RoomService {
         // 채팅방 생성 완료와 동시에 참여자들에게 알림 전송
         String hostname = host.getNickname();
         String roomTitle = room.getTitle();
-        String message = String.format("%s님이 \"%s\" 채팅방을 생성했습니다. 참여하시겠습니까?", hostname, roomTitle);
+        String message = String.format("%s님이 \"%s\" 채팅방에 초대했습니다.", hostname, roomTitle);
         log.info("메시지 내용 확인: " + message);
 
         List<MemberRoom> roomMembers = memberRoomRepository.findByRoom(room);
@@ -102,10 +104,12 @@ public class RoomService {
         List<Room> rooms = new ArrayList<>();
         List<MemberRoom> memberRooms = new ArrayList<>();
         memberRooms = memberRoomRepository.findByMember(member); // 자기가 게스트인 그룹의 인포
-        rooms = roomRepository.findByMember(member); // 자기가 호스트인 그룹
+        rooms = roomRepository.findByMemberAndDeleteYn(member, "N"); // 자기가 호스트인 그룹
 
         for (MemberRoom memberRoom : memberRooms) {
-            rooms.add(memberRoom.getRoom());
+            if(memberRoom.getRoom().getDeleteYn().equals("N")){
+                rooms.add(memberRoom.getRoom());
+            }
         }
         // 자기가 속한 모든 채팅방 = rooms
         List<RoomListResponse> roomListResponses = new ArrayList<>();
@@ -139,5 +143,56 @@ public class RoomService {
         }
 
         return new ArrayList<>(roomListResponses.subList(fromIndex, toIndex));
+    }
+
+    @Transactional
+    @Scheduled(cron = "0 0/1 * * * *")
+    public void scheduleChatingDelete() throws JsonProcessingException {
+        // 삭제 되지 않은 모든 모임을 조회
+        List<Room> rooms = roomRepository.findByDeleteYn("N");
+
+        for(Room room: rooms){
+            if(room.getDeleteDate().isBefore(LocalDateTime.now(ZoneId.of("Asia/Seoul")))){
+                String roomTitle = room.getTitle();
+                String message = String.format("\"%s\" 채팅방이 종료 되었습니다." ,roomTitle);
+                log.info("메시지 내용 확인: " + message);
+
+                // 모든 게스트에게 알람
+                List<MemberRoom> roomMembers = memberRoomRepository.findByRoom(room);
+                for (MemberRoom roomMember : roomMembers) {
+                    String participantEmail = roomMember.getMember().getEmail();
+                    log.info("참여자 이메일 주소: " + participantEmail);
+                    sseService.sendRoomNotification(participantEmail,
+                            RoomNotification.from(room, message, NotificationType.ROOM, LocalDateTime.now()));
+                }
+                // 호스트에게도 알람
+                sseService.sendRoomNotification(room.getMember().getEmail(),
+                        RoomNotification.from(room, message, NotificationType.ROOM, LocalDateTime.now()));
+                room.delete();
+            }
+            // 채팅 마감시간 10분전 알림 보내기
+            if(room.getDeleteDate().minusMinutes(10).isBefore(LocalDateTime.now(ZoneId.of("Asia/Seoul"))) && room.getDeleteDate().minusMinutes(9).isAfter(LocalDateTime.now(ZoneId.of("Asia/Seoul")))){
+                // 채팅방 마감 전 채팅에 참여한 모든 사람들에게
+
+                String roomTitle = room.getTitle();
+                String message = String.format("\"%s\" 채팅방 종료 10분 전 입니다." , roomTitle);
+                log.info("메시지 내용 확인: " + message);
+
+                // 모든 게스트에게 알람
+                List<MemberRoom> roomMembers = memberRoomRepository.findByRoom(room);
+                for (MemberRoom roomMember : roomMembers) {
+                    String participantEmail = roomMember.getMember().getEmail();
+                    log.info("참여자 이메일 주소: " + participantEmail);
+                    sseService.sendRoomNotification(participantEmail,
+                            RoomNotification.from(room, message, NotificationType.ROOM, LocalDateTime.now()));
+                }
+                // 호스트에게도 알람
+                sseService.sendRoomNotification(room.getMember().getEmail(),
+                        RoomNotification.from(room, message, NotificationType.ROOM, LocalDateTime.now()));
+            }
+        }
+
+
+
     }
 }
