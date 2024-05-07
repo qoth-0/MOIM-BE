@@ -20,16 +20,13 @@ import com.team1.moim.domain.notification.dto.RoomNotification;
 import com.team1.moim.global.config.sse.service.SseService;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -100,7 +97,7 @@ public class RoomService {
 
     public List<RoomListResponse> findAllRoom(int pageNum) {
         // 1페이지당 나오는 갯수
-        int size = 6;
+        int size = 7;
         Member member = findMemberByEmail();
         List<Room> rooms = new ArrayList<>();
         List<MemberRoom> memberRooms = new ArrayList<>();
