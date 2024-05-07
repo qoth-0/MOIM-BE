@@ -22,9 +22,11 @@ import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.time.ZoneId;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -139,5 +141,17 @@ public class RoomService {
         }
 
         return new ArrayList<>(roomListResponses.subList(fromIndex, toIndex));
+    }
+
+    @Transactional
+    @Scheduled(cron = "0 0/1 * * * *")
+    public void scheduleChatingDelete() throws JsonProcessingException {
+        List<Room> rooms = roomRepository.findByDeleteYn("N");
+
+        for(Room room: rooms){
+            if(room.getDeleteDate().isBefore(LocalDateTime.now(ZoneId.of("Asia/Seoul")))){
+                room.delete();
+            }
+        }
     }
 }
