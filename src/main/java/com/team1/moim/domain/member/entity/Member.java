@@ -19,13 +19,14 @@ public class Member extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, length = 254)
     private String email; // 대표 이메일
 
     // 소셜 로그인 유저의 경우 비밀번호가 필요 없으므로, nullable
+    @Column(length = 60)
     private String password;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, length = 15)
     private String nickname;
 
     @Column(nullable = false)

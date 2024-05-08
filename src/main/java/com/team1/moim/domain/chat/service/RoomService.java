@@ -90,7 +90,7 @@ public class RoomService {
             String participantEmail = roomMember.getMember().getEmail();
             log.info("참여자 이메일 주소: " + participantEmail);
             sseService.sendRoomNotification(participantEmail,
-                    RoomNotification.from(room, message, NotificationType.ROOM, LocalDateTime.now()));
+                    RoomNotification.from(room, message, NotificationType.ROOM, LocalDateTime.now(ZoneId.of("Asia/Seoul"))));
         }
 
         return RoomDetailResponse.from(room);
@@ -163,11 +163,11 @@ public class RoomService {
                     String participantEmail = roomMember.getMember().getEmail();
                     log.info("참여자 이메일 주소: " + participantEmail);
                     sseService.sendRoomNotification(participantEmail,
-                            RoomNotification.from(room, message, NotificationType.ROOM, LocalDateTime.now()));
+                            RoomNotification.from(room, message, NotificationType.ROOM, LocalDateTime.now(ZoneId.of("Asia/Seoul"))));
                 }
                 // 호스트에게도 알람
                 sseService.sendRoomNotification(room.getMember().getEmail(),
-                        RoomNotification.from(room, message, NotificationType.ROOM, LocalDateTime.now()));
+                        RoomNotification.from(room, message, NotificationType.ROOM, LocalDateTime.now(ZoneId.of("Asia/Seoul"))));
                 room.delete();
             }
             // 채팅 마감시간 10분전 알림 보내기
@@ -184,11 +184,11 @@ public class RoomService {
                     String participantEmail = roomMember.getMember().getEmail();
                     log.info("참여자 이메일 주소: " + participantEmail);
                     sseService.sendRoomNotification(participantEmail,
-                            RoomNotification.from(room, message, NotificationType.ROOM, LocalDateTime.now()));
+                            RoomNotification.from(room, message, NotificationType.ROOM, LocalDateTime.now(ZoneId.of("Asia/Seoul"))));
                 }
                 // 호스트에게도 알람
                 sseService.sendRoomNotification(room.getMember().getEmail(),
-                        RoomNotification.from(room, message, NotificationType.ROOM, LocalDateTime.now()));
+                        RoomNotification.from(room, message, NotificationType.ROOM, LocalDateTime.now(ZoneId.of("Asia/Seoul"))));
             }
         }
 

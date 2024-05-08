@@ -223,6 +223,20 @@ public class EventController {
                         eventService.getDaily(year, month, day)));
     }
 
+//    오늘의 일정 조회
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @GetMapping("/today")
+    public ResponseEntity<ApiSuccessResponse<List<TodayEventResponse>>> getToday(HttpServletRequest httpServletRequest) {
+        log.info("오늘의 일정 조회 시작");
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiSuccessResponse.of(
+                        HttpStatus.OK,
+                        httpServletRequest.getServletPath(),
+                        eventService.getToday()));
+    }
+
+
 //    일정 상세 조회
     @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping("/{eventId}")
