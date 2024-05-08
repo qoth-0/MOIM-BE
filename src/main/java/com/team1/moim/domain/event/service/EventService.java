@@ -363,7 +363,7 @@ public class EventService {
                                         event,
                                         alarm,
                                         member,
-                                        LocalDateTime.now(),
+                                        LocalDateTime.now(ZoneId.of("Asia/Seoul")),
                                         NotificationType.EVENT));
                         alarm.sendCheck("Y");
                     }
@@ -376,7 +376,7 @@ public class EventService {
                                         event,
                                         alarm,
                                         member,
-                                        LocalDateTime.now(),
+                                        LocalDateTime.now(ZoneId.of("Asia/Seoul")),
                                         NotificationType.EVENT));
                         alarm.sendCheck("Y");
                     }
@@ -389,7 +389,7 @@ public class EventService {
                                         event,
                                         alarm,
                                         member,
-                                        LocalDateTime.now(),
+                                        LocalDateTime.now(ZoneId.of("Asia/Seoul")),
                                         NotificationType.EVENT));
                         alarm.sendCheck("Y");
                     }

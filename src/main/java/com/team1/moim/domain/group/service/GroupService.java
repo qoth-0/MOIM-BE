@@ -23,6 +23,7 @@ import com.team1.moim.global.config.s3.S3Service;
 import com.team1.moim.domain.notification.dto.GroupNotification;
 import com.team1.moim.global.config.sse.service.SseService;
 
+import java.time.ZoneId;
 import java.util.*;
 
 import lombok.RequiredArgsConstructor;
@@ -121,7 +122,7 @@ public class GroupService {
             String participantEmail = groupInfo.getMember().getEmail();
             log.info("참여자 이메일 주소: " + participantEmail);
             sseService.sendGroupNotification(participantEmail,
-                    GroupNotification.from(newGroup, message, NotificationType.GROUP_CREATE, LocalDateTime.now()));
+                    GroupNotification.from(newGroup, message, NotificationType.GROUP_CREATE, LocalDateTime.now(ZoneId.of("Asia/Seoul"))));
         }
 
         return GroupDetailResponse.from(newGroup);
@@ -158,7 +159,7 @@ public class GroupService {
 
                     // 호스트 알림 발송
                     sseService.sendGroupNotification(group.getMember().getEmail(),
-                            GroupNotification.from(group, message, NotificationType.GROUP_CANCEL, LocalDateTime.now()));
+                            GroupNotification.from(group, message, NotificationType.GROUP_CANCEL, LocalDateTime.now(ZoneId.of("Asia/Seoul"))));
 
                 } else {
                     // 참여자가 있을 경우
@@ -190,11 +191,11 @@ public class GroupService {
 
                         // 호스트도 알림 발송
                         sseService.sendGroupNotification(group.getMember().getEmail(),
-                                GroupNotification.from(group, message, NotificationType.GROUP_CANCEL, LocalDateTime.now()));
+                                GroupNotification.from(group, message, NotificationType.GROUP_CANCEL, LocalDateTime.now(ZoneId.of("Asia/Seoul"))));
 
                         for (GroupInfo agreedParticipant : participants) {
                             sseService.sendGroupNotification(agreedParticipant.getMember().getEmail(),
-                                    GroupNotification.from(group, message, NotificationType.GROUP_CANCEL, LocalDateTime.now()));
+                                    GroupNotification.from(group, message, NotificationType.GROUP_CANCEL, LocalDateTime.now(ZoneId.of("Asia/Seoul"))));
                         }
 
                         // 모일 수 있는 일정이 1개라면 자동으로 모임을 확정 짓고 모두에게 알림 전송
@@ -209,11 +210,11 @@ public class GroupService {
 
                         // 호스트도 알림 발송
                         sseService.sendGroupNotification(group.getMember().getEmail(),
-                                GroupNotification.from(group, message, NotificationType.GROUP_CONFIRM, LocalDateTime.now()));
+                                GroupNotification.from(group, message, NotificationType.GROUP_CONFIRM, LocalDateTime.now(ZoneId.of("Asia/Seoul"))));
 
                         for (GroupInfo agreedParticipant : participants) {
                             sseService.sendGroupNotification(agreedParticipant.getMember().getEmail(),
-                                    GroupNotification.from(group, message, NotificationType.GROUP_CONFIRM, LocalDateTime.now()));
+                                    GroupNotification.from(group, message, NotificationType.GROUP_CONFIRM, LocalDateTime.now(ZoneId.of("Asia/Seoul"))));
                         }
                         // 추천 일정이 여러개라면 모임 확정 알림을 호스트 에게만 전송
                     } else {
@@ -221,7 +222,7 @@ public class GroupService {
                         group.updateGroupType(GroupType.GROUP_CHOICE);
                         // 호스트한테만 알림 발송
                         sseService.sendGroupNotification(group.getMember().getEmail(),
-                                GroupNotification.from(group, message, NotificationType.GROUP_CHOICE, LocalDateTime.now()));
+                                GroupNotification.from(group, message, NotificationType.GROUP_CHOICE, LocalDateTime.now(ZoneId.of("Asia/Seoul"))));
                     }
                 }
             }
@@ -405,7 +406,7 @@ public class GroupService {
 
                 // 호스트 알림 발송
                 sseService.sendGroupNotification(updatedGroup.getMember().getEmail(),
-                        GroupNotification.from(updatedGroup, message, NotificationType.GROUP_CANCEL, LocalDateTime.now()));
+                        GroupNotification.from(updatedGroup, message, NotificationType.GROUP_CANCEL, LocalDateTime.now(ZoneId.of("Asia/Seoul"))));
             }
 
 
@@ -422,11 +423,11 @@ public class GroupService {
 
                 // 호스트도 알림 발송
                 sseService.sendGroupNotification(updatedGroup.getMember().getEmail(),
-                        GroupNotification.from(updatedGroup, message, NotificationType.GROUP_CANCEL, LocalDateTime.now()));
+                        GroupNotification.from(updatedGroup, message, NotificationType.GROUP_CANCEL, LocalDateTime.now(ZoneId.of("Asia/Seoul"))));
 
                 for (GroupInfo agreedParticipant : agreedParticipants){
                     sseService.sendGroupNotification(agreedParticipant.getMember().getEmail(),
-                            GroupNotification.from(updatedGroup, message, NotificationType.GROUP_CANCEL, LocalDateTime.now()));
+                            GroupNotification.from(updatedGroup, message, NotificationType.GROUP_CANCEL, LocalDateTime.now(ZoneId.of("Asia/Seoul"))));
                 }
 
                 // 모일 수 있는 일정이 1개라면 자동으로 모임을 확정 짓고 모두에게 알림 전송
@@ -441,11 +442,11 @@ public class GroupService {
 
                 // 호스트도 알림 발송
                 sseService.sendGroupNotification(updatedGroup.getMember().getEmail(),
-                        GroupNotification.from(updatedGroup, message, NotificationType.GROUP_CONFIRM, LocalDateTime.now()));
+                        GroupNotification.from(updatedGroup, message, NotificationType.GROUP_CONFIRM, LocalDateTime.now(ZoneId.of("Asia/Seoul"))));
 
                 for (GroupInfo agreedParticipant : agreedParticipants){
                     sseService.sendGroupNotification(agreedParticipant.getMember().getEmail(),
-                            GroupNotification.from(updatedGroup, message, NotificationType.GROUP_CONFIRM, LocalDateTime.now()));
+                            GroupNotification.from(updatedGroup, message, NotificationType.GROUP_CONFIRM, LocalDateTime.now(ZoneId.of("Asia/Seoul"))));
                 }
                 // 추천 일정이 여러개라면 모임 확정 알림을 호스트 에게만 전송
             } else {
@@ -453,7 +454,7 @@ public class GroupService {
                 updatedGroup.updateGroupType(GroupType.GROUP_CHOICE);
                 // 호스트한테만 알림 발송
                 sseService.sendGroupNotification(updatedGroup.getMember().getEmail(),
-                        GroupNotification.from(updatedGroup, message, NotificationType.GROUP_CHOICE, LocalDateTime.now()));
+                        GroupNotification.from(updatedGroup, message, NotificationType.GROUP_CHOICE, LocalDateTime.now(ZoneId.of("Asia/Seoul"))));
             }
         }
 
@@ -482,7 +483,7 @@ public class GroupService {
         for (GroupInfo participant : participants) {
             sseService.sendGroupNotification(
                     participant.getMember().getEmail(),
-                    GroupNotification.from(participant.getGroup(), message, NotificationType.GROUP_DEADLINE, LocalDateTime.now()));
+                    GroupNotification.from(participant.getGroup(), message, NotificationType.GROUP_DEADLINE, LocalDateTime.now(ZoneId.of("Asia/Seoul"))));
         }
         groupAlarm.sendCheck("Y");
     }
@@ -687,12 +688,12 @@ public class GroupService {
 
         // 알림 발송
         sseService.sendGroupNotification(group.getMember().getEmail(),
-                GroupNotification.from(group, message, NotificationType.GROUP_CONFIRM, LocalDateTime.now()));
+                GroupNotification.from(group, message, NotificationType.GROUP_CONFIRM, LocalDateTime.now(ZoneId.of("Asia/Seoul"))));
 
 
         for (GroupInfo agreedParticipant : agreedParticipants){
             sseService.sendGroupNotification(agreedParticipant.getMember().getEmail(),
-                    GroupNotification.from(group, message, NotificationType.GROUP_CONFIRM, LocalDateTime.now()));
+                    GroupNotification.from(group, message, NotificationType.GROUP_CONFIRM, LocalDateTime.now(ZoneId.of("Asia/Seoul"))));
         }
 
         return FindConfirmedGroupResponse.from(groupRepository.save(group));
@@ -713,7 +714,7 @@ public class GroupService {
         // 알림 발송
         for (GroupInfo agreedParticipant : agreedParticipants){
             sseService.sendGroupNotification(agreedParticipant.getMember().getEmail(),
-                    GroupNotification.from(group, message, NotificationType.GROUP_CANCEL, LocalDateTime.now()));
+                    GroupNotification.from(group, message, NotificationType.GROUP_CANCEL, LocalDateTime.now(ZoneId.of("Asia/Seoul"))));
         }
         return FindConfirmedGroupResponse.from(groupRepository.save(group));
     }
