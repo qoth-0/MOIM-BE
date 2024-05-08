@@ -31,9 +31,8 @@ import com.team1.moim.domain.notification.dto.EventNotification;
 import com.team1.moim.global.config.s3.S3Service;
 import com.team1.moim.global.config.sse.service.SseService;
 import jakarta.transaction.Transactional;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+
+import java.time.*;
 import java.time.chrono.ChronoLocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
@@ -364,7 +363,7 @@ public class EventService {
                                         event,
                                         alarm,
                                         member,
-                                        LocalDateTime.now(),
+                                        LocalDateTime.now(ZoneId.of("Asia/Seoul")),
                                         NotificationType.EVENT));
                         alarm.sendCheck("Y");
                     }
@@ -377,7 +376,7 @@ public class EventService {
                                         event,
                                         alarm,
                                         member,
-                                        LocalDateTime.now(),
+                                        LocalDateTime.now(ZoneId.of("Asia/Seoul")),
                                         NotificationType.EVENT));
                         alarm.sendCheck("Y");
                     }
@@ -390,7 +389,7 @@ public class EventService {
                                         event,
                                         alarm,
                                         member,
-                                        LocalDateTime.now(),
+                                        LocalDateTime.now(ZoneId.of("Asia/Seoul")),
                                         NotificationType.EVENT));
                         alarm.sendCheck("Y");
                     }
@@ -535,5 +534,34 @@ public class EventService {
         ToDoList toDoList = toDoListRepository.findById(todoId).orElseThrow(TodoNotFoundException::new);
         toDoList.updateisChecked(isChecked);
         return TodoResponse.from(toDoListRepository.save(toDoList));
+    }
+
+    public List<TodayEventResponse> getToday() {
+        Member member = findMemberByEmail();
+        log.info(member.getNickname() + "님 일정 조회");
+        LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
+        LocalDateTime todayStart = today.atStartOfDay(ZoneId.of("Asia/Seoul")).toLocalDateTime();
+        LocalDateTime todayEnd = today.atTime(LocalTime.MAX).atZone(ZoneId.of("Asia/Seoul")).toLocalDateTime();
+        List<Event> events = eventRepository.findByMemberAndToday(member, todayStart, todayEnd);
+        if (events.isEmpty()) throw new EventNotFoundException();
+        List<TodayEventResponse> todayEventResponses = new ArrayList<>();
+        for (Event event : events) {
+            log.info(event.getTitle());
+            List<ToDoList> toDoLists = toDoListRepository.findByEventId(event.getId());
+            List<String[]> eventTodoList = new ArrayList<>();
+
+            for(ToDoList toDoList: toDoLists){
+                String[] tempTodoList = new String[3];
+                tempTodoList[0] = String.valueOf(toDoList.getId());
+                tempTodoList[1] = toDoList.getContents();
+                tempTodoList[2] = toDoList.getIsChecked();
+                eventTodoList.add(tempTodoList);
+            }
+            TodayEventResponse eventResponse = TodayEventResponse.from(event, eventTodoList);
+            todayEventResponses.add(eventResponse);
+        }
+        Collections.sort(todayEventResponses, Comparator.comparing(TodayEventResponse::getStartDate));
+
+        return todayEventResponses;
     }
 }
