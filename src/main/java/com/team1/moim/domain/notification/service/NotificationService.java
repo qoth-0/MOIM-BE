@@ -29,18 +29,9 @@ public class NotificationService {
         return alarms;
     }
 
-//    public String readAlarm(Long memberId, Long alarmId) {
-//        Member member = memberRepository.findById(memberId).orElseThrow(MemberNotFoundException::new);
-//        log.info(member.getNickname() + "회원");
-//        String key = member.getEmail();
-//        String loginEmail = SecurityContextHolder.getContext().getAuthentication().getTitle();
-//        if(!key.equals(loginEmail)) throw new MemberNotMatchException();
-//        List<NotificationResponseNew> alarms= redisService.getList(key);
-//        alarms.stream()
-//                .filter(notification -> Objects.equals(notification.getAlarmId(), alarmId))
-//                .findFirst()
-//                .ifPresent(notification -> notification.read("Y"));
-//        redisService.saveList(key, alarms);
-//        return "알림 읽음 처리 되었습니다.";
-//    }
+    public String readAlarm(Long redisId) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        redisService.updateReadYn(email, redisId);
+        return "알림 읽음 처리 되었습니다.";
+    }
 }

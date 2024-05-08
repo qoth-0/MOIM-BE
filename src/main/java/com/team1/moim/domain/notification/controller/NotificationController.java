@@ -39,16 +39,15 @@ public class NotificationController {
                         notificationService.getAlarms()));
     }
 
-//    //    알림 읽음으로 변경
-//    @PreAuthorize("hasRole('ROLE_USER')")
-//    @PatchMapping("/{memberId}/{alarmId}")
-//    public ResponseEntity<ApiSuccessResponse<String>> readAlarm(HttpServletRequest httpServletRequest,
-//                                                                @PathVariable(name = "memberId") Long memberId,
-//                                                                @PathVariable(name = "alarmId") Long alarmId) {
-//        return ResponseEntity.status(HttpStatus.OK)
-//                .body(ApiSuccessResponse.of(
-//                        HttpStatus.OK,
-//                        httpServletRequest.getServletPath(),
-//                        notificationService.readAlarm(memberId, alarmId)));
-//    }
+    //    알림 읽음으로 변경
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @PatchMapping("/{redisId}")
+    public ResponseEntity<ApiSuccessResponse<String>> readAlarm(HttpServletRequest httpServletRequest,
+                                                                @PathVariable(name = "redisId") Long redisId) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiSuccessResponse.of(
+                        HttpStatus.OK,
+                        httpServletRequest.getServletPath(),
+                        notificationService.readAlarm(redisId)));
+    }
 }
