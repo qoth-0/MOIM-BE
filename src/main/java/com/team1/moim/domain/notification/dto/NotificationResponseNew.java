@@ -11,14 +11,16 @@ public class NotificationResponseNew {
     private NotificationType notificationType;
     // event 또는 gruop의 chatId
     private Long id;
+    private Long redisId;
     private String nickname;
     private String message;
     private String sendTime;
     private String readYn;
 
     @Builder
-    public NotificationResponseNew(Long id, String nickname, String message, String sendTime, NotificationType notificationType, String readYn) {
+    public NotificationResponseNew(Long id, Long redisId,  String nickname, String message, String sendTime, NotificationType notificationType, String readYn) {
         this.id = id;
+        this.redisId = redisId;
         this.nickname = nickname;
         this.message = message;
         this.sendTime = sendTime;
@@ -26,9 +28,10 @@ public class NotificationResponseNew {
         this.readYn = readYn;
     }
 
-    public static NotificationResponseNew fromEvent(EventNotification eventNotification){
+    public static NotificationResponseNew fromEvent(EventNotification eventNotification, Long redisId){
         return NotificationResponseNew.builder()
                 .id(eventNotification.getEventId())
+                .redisId(redisId)
                 .nickname(eventNotification.getNickname())
                 .message(eventNotification.getMessage())
                 .sendTime(eventNotification.getSendTime())
@@ -37,9 +40,10 @@ public class NotificationResponseNew {
                 .build();
     }
 
-    public static NotificationResponseNew fromGroup(GroupNotification groupNotification){
+    public static NotificationResponseNew fromGroup(GroupNotification groupNotification, Long redisId){
         return NotificationResponseNew.builder()
                 .id(groupNotification.getGroupId())
+                .redisId(redisId)
                 .nickname(groupNotification.getHostName())
                 .message(groupNotification.getMessage())
                 .sendTime(groupNotification.getSendTime())
@@ -48,9 +52,10 @@ public class NotificationResponseNew {
                 .build();
     }
 
-    public static NotificationResponseNew fromRoom(RoomNotification roomNotification) {
+    public static NotificationResponseNew fromRoom(RoomNotification roomNotification, Long redisId) {
         return NotificationResponseNew.builder()
                 .id(roomNotification.getRoomId())
+                .redisId(redisId)
                 .nickname(roomNotification.getHostName())
                 .message(roomNotification.getMessage())
                 .sendTime(roomNotification.getSendTime())
