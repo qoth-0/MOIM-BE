@@ -97,16 +97,18 @@ public class RedisService {
         ListOperations<String, Object> listOperations = redisTemplate1.opsForList();
         List<Object> alarms = listOperations.range(key, 0, -1);
         List<NotificationResponseNew> notificationResponses = new ArrayList<>();
+        long redisId = 0;
         for(Object alarm : alarms) {
             if(alarm instanceof EventNotification) {
-                notificationResponses.add(NotificationResponseNew.fromEvent((EventNotification) alarm));
+                notificationResponses.add(NotificationResponseNew.fromEvent((EventNotification) alarm, redisId));
             }
             if(alarm instanceof GroupNotification) {
-                notificationResponses.add(NotificationResponseNew.fromGroup((GroupNotification) alarm));
+                notificationResponses.add(NotificationResponseNew.fromGroup((GroupNotification) alarm, redisId));
             }
             if(alarm instanceof RoomNotification) {
-                notificationResponses.add(NotificationResponseNew.fromRoom((RoomNotification) alarm));
+                notificationResponses.add(NotificationResponseNew.fromRoom((RoomNotification) alarm, redisId));
             }
+            redisId++;
 
         }
         return notificationResponses;
@@ -129,6 +131,18 @@ public class RedisService {
         // 변경된 리스트 추가
         for (EventNotification notificationResponse : notificationResponses) {
             listOperations.leftPush(key, notificationResponse);
+        }
+    }
+
+    public void updateReadYn(String key, Long index) {
+        ListOperations<String, Object> listOperations = redisTemplate1.opsForList();
+        Object alarm = listOperations.index(key, index);
+        // 값이 있는 경우에만 제거
+        if (alarm != null) {
+            // 해당 값으로 리스트에서 요소를 삭제 (앞에서 첫 번째 매치되는 값 제거)
+            listOperations.remove(key, 1, alarm);
+        } else {
+            throw new IllegalArgumentException("해당 인덱스에 일치하는 알림이 없습니다.");
         }
     }
 
