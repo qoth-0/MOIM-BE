@@ -10,7 +10,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry){
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:8081")
+                .allowedOrigins("https://www.jangeunji.shop")
                 .allowedMethods("*")
                 .allowedHeaders("*")
                 .allowCredentials(true); // 쿠키 인증 요청 허용

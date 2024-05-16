@@ -138,7 +138,7 @@ public class GroupService {
         for (Group group : groups) {
 
             // 마감 시간이 도달한 그룹 확정 및 알림 전송
-            if(group.getVoteDeadline().isBefore(LocalDateTime.now())) {
+            if(group.getVoteDeadline().isBefore(LocalDateTime.now(ZoneId.of("Asia/Seoul")))) {
 
                 List<GroupInfo> participants =
                         groupInfoRepository.findByGroupAndIsAgreed(group, "Y");
@@ -235,14 +235,14 @@ public class GroupService {
             for (GroupAlarm groupAlarm : groupAlarms) {
                 if (groupAlarm.getGroupAlarmTimeType() == GroupAlarmTimeType.DAY
                         && groupAlarm.getGroup().getVoteDeadline().minusDays(
-                                groupAlarm.getDeadlineAlarm()).isBefore(LocalDateTime.now())){
+                                groupAlarm.getDeadlineAlarm()).isBefore(LocalDateTime.now(ZoneId.of("Asia/Seoul")))){
                     sendAlarmForParticipants(groupAlarm);
                     return;
                 }
 
                 if (groupAlarm.getGroupAlarmTimeType() == GroupAlarmTimeType.HOUR
                         && groupAlarm.getGroup().getVoteDeadline().minusHours(
-                                groupAlarm.getDeadlineAlarm()).isBefore(LocalDateTime.now())) {
+                                groupAlarm.getDeadlineAlarm()).isBefore(LocalDateTime.now(ZoneId.of("Asia/Seoul")))) {
                     sendAlarmForParticipants(groupAlarm);
 
                     return;
@@ -250,7 +250,7 @@ public class GroupService {
 
                 if (groupAlarm.getGroupAlarmTimeType() == GroupAlarmTimeType.MIN
                         && groupAlarm.getGroup().getVoteDeadline().minusMinutes(
-                                groupAlarm.getDeadlineAlarm()).isBefore(LocalDateTime.now())) {
+                                groupAlarm.getDeadlineAlarm()).isBefore(LocalDateTime.now(ZoneId.of("Asia/Seoul")))) {
                     sendAlarmForParticipants(groupAlarm);
 
                     return;

@@ -67,7 +67,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     }
 
     private String makeRedirectUrl(String accessToken, String refreshToken){
-        return UriComponentsBuilder.fromUriString("http://localhost:8081/oauth2/redirect")
+        return UriComponentsBuilder.fromUriString("https://www.jangeunji.shop/oauth2/redirect")
                 .queryParam("accessToken", accessToken)
                 .queryParam("refreshToken", refreshToken)
                 .build().toUriString();

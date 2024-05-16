@@ -99,6 +99,7 @@ public class RedisService {
         List<NotificationResponseNew> notificationResponses = new ArrayList<>();
         long redisId = 0;
         for(Object alarm : alarms) {
+            log.info("alarm: " + alarm);
             if(alarm instanceof EventNotification) {
                 notificationResponses.add(NotificationResponseNew.fromEvent((EventNotification) alarm, redisId));
             }

@@ -1,0 +1,107 @@
+# 예외 처리를 커스텀하게 진행하기 위해 Whitelabel Error Page 옵션 OFF
+server:
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+  error:
+    whitelabel:
+      enabled: false
+spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+#    url: jdbc:mariadb://localhost:3306/moim  // root, 1234
+    url: jdbc:mariadb://${DB_HOST}:3306/moim
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MariaDBDialect
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create
+    show_sql: true
+  data:
+    redis:
+      # Spring data JPA repository 와 Spirng data redis Repository가 모두 인식되어
+      # redis가 이게 내 리포지토리가 맞아? 그럼 명시해줘 라는 로그 해결
+      repositories:
+        enabled: false
+#      host: localhost
+      host: ${REDIS_HOST}
+      port: 6379
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${USERNAME}
+    password: ${PASSWORD}
+    properties:
+      mail:
+        debug: true
+        smtp.auth: true
+        smtp.timeout: 50000 # SMTP 서버에 연결을 시도하고 응답을 기다리는 최대 시간이 50,000ms
+        smtp.starttls.enable: true
+  security:
+    oauth2:
+      client:
+        # OAuth 로그인 시 설정한 Application의 정보를 사용하여
+        # AccessToken을 Authorization Server에게 발급받을 때 사용
+        registration:
+          google:
+            client-id: ${GOOGLE_ID}
+            client-secret: ${GOOGLE_SECRET}
+            redirect-uri: https://server.jangeunji.shop/login/oauth2/code/google
+            scope: profile, email
+
+          kakao:
+            client-id: ${KAKAO_ID}
+            client-secret: ${KAKAO_SECRET}
+            redirect-uri: https://server.jangeunji.shop/login/oauth2/code/kakao
+            client-authentication-method: client_secret_post
+            authorization-grant-type: authorization_code
+            scope: account_email, profile_nickname, profile_image
+            client-name: Kakao
+
+        # Spring에서 카카오의 provider 정보는 제공하지 않으므로, 직접 설정 필요
+        # AccessToken을 Authorization Server에게 발급 받은 후,
+        # 해당 AccessToken으로 Resource Server의 API를 사용할 때
+        # provider 부분의 정보를 사용하여 API 호출
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+
+jwt:
+  secretKey: ${JWT}
+
+  access:
+    # access token 만료시간 / 30분 (1000L(ms -> s) * 60L(s -> m) * 30L(m -> h))
+    #    expiration: 1800000
+    expiration: 6000000000
+    header: Authorization
+
+  refresh:
+    # refresh token 만료시간 / 2주 (1000L(ms -> s) * 60L(s -> m) * 60L(m -> h) * 24L(h -> 하루) * 14)
+    expiration: 1209600000
+    header: Authorization_Refresh
+
+cloud:
+  aws:
+    credentials:
+      access-key: ${ACCESS-KEY}
+      secret-key: ${SECRET-KEY}
+    s3:
+      bucket: moim-bucket
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+custom:
+  api:
+    secretKey: ${SECRET}
