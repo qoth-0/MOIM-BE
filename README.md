@@ -30,8 +30,7 @@
 
 🚀 **CI/CD :**
 <img src="https://img.shields.io/badge/GithubActions-2088FF?style=flat-square&logo=GithubActions&logoColor=white">
-<img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=Docker&logoColor=white">
-<img src="https://img.shields.io/badge/NGINX-009639?style=flat-square&logo=NGINX&logoColor=white">
+<img src="https://img.shields.io/badge/Dockerhub-2496ED?style=flat-square&logo=Docker&logoColor=white">
 
 🔊 **Tools :**
 <img src="https://img.shields.io/badge/Github-181717?style=flat-square&logo=github&logoColor=white">
